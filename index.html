@@ -59,6 +59,7 @@
 <div class="toast" id="toast"></div>
 <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-auth-compat.js"></script>
 <script>
 (function(){
   'use strict';
@@ -78,6 +79,16 @@
     appId: "1:546700909302:web:30f635c302f7a6b50bead7"
   };
   if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+
+auth.signInWithEmailAndPassword(
+  "admin@gmail.com",
+  "12345678"
+).then(()=>{
+  console.log("Firebase Login OK");
+}).catch((err)=>{
+  console.log(err);
+});
   const dbRef = firebase.database().ref('hauDaiData');
   function fmt(n){return Number(String(n||0).replace(/,/g,'')||0).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});}
   function toast(msg){const el=$('toast'); el.textContent=msg; el.classList.add('show'); clearTimeout(toastTimer); toastTimer=setTimeout(()=>el.classList.remove('show'),2200);}
