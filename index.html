@@ -152,11 +152,17 @@ function fixNegativeNumbers() {
   document.querySelectorAll("td, span, div").forEach(el => {
     let text = el.textContent.trim();
 
+    // Bỏ qua nếu bên trong có thẻ con
+    if (el.children.length > 0) return;
+
+    // Nếu đã sửa rồi thì giữ màu đỏ
     if (/^\(-[\d,]+(\.\d+)?\)$/.test(text)) {
       el.style.color = "red";
+      el.style.fontWeight = "600";
       return;
     }
 
+    // Nếu là số âm thì đổi thành (-xxx)
     if (/^-[\d,]+(\.\d+)?$/.test(text)) {
       el.textContent = "(" + text + ")";
       el.style.color = "red";
@@ -165,8 +171,11 @@ function fixNegativeNumbers() {
   });
 }
 
-fixNegativeNumbers();
-setInterval(fixNegativeNumbers, 1000);
+window.addEventListener("load", function () {
+  fixNegativeNumbers();
+  setTimeout(fixNegativeNumbers, 500);
+  setTimeout(fixNegativeNumbers, 1500);
+});
 </script>
 
 </body>
