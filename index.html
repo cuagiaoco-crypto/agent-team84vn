@@ -132,7 +132,11 @@ auth.signInWithEmailAndPassword(
   function tableRows(rows){return rows.map(r=>'<tr>'+r.map(v=>'<td>'+v+'</td>').join('')+'</tr>').join('');}
   function empty(cols){return `<tr><td colspan="${cols}" class="empty">No data available in table</td></tr>`;}
   function renderTop(a){document.querySelectorAll('.urlbox .u')[0].textContent=a.registerLink;document.querySelectorAll('.urlbox .u')[1].textContent=a.referralLink;document.querySelector('.money').textContent='₫ '+fmt(a.balance);}
-  function renderDashboard(){const a=active(); if(!a)return; renderTop(a); const box=$('panels'); const m=a.metrics||zeroMetrics(); $('dashboardPage').querySelector('.summary').innerHTML=`<div class="stat"><div class="stat-title">Hoa hồng</div><div class="stat-lines"><b>Kỳ này</b><span class="num">₫${fmt(a.commissionCurrent||0)}</span><b>Kỳ trước</b><span class="num">₫${fmt(a.commissionPrev||0)}</span></div></div><div class="stat green"><div class="stat-title">Đang hoạt động</div><div class="stat-lines"><b>Kỳ này</b><span class="num">${a.activeCurrent||0}</span><b>Kỳ trước</b><span class="num">${a.activePrev||0}</span></div></div>`; box.innerHTML=''; Object.keys(m).forEach(name=>{const rows=m[name]; let h=`<section class="panel ${name==='Lỗ Lãi Chi Nhánh'?'wide':''}"><div class="panel-head"><span class="mini"></span>${name}<span class="up">⌃</span></div><div class="panel-body"><div class="table-wrap"><table><thead><tr><th>Giai đoạn</th><th>Đếm</th><th>Số tiền</th></tr></thead><tbody>`; rows.forEach(r=>h+=`<tr><td>${r[0]}</td><td>${r[1]}</td><td>${fmt(r[2])}</td></tr>`); h+='</tbody></table></div></div></section>'; box.insertAdjacentHTML('beforeend',h);}); box.querySelectorAll('.up').forEach(b=>b.onclick=()=>b.closest('.panel').classList.toggle('closed'));}
+  function renderDashboard(){const a=active(); if(!a)return; renderTop(a); const box=$('panels'); const m=a.metrics||zeroMetrics(); $('dashboardPage').querySelector('.summary').innerHTML=`<div class="stat"><div class="stat-title">Hoa hồng</div><div class="stat-lines"><b>Kỳ này</b><span class="num">₫${fmt(a.commissionCurrent||0)}</span><b>Kỳ trước</b><span class="num">₫${fmt(a.commissionPrev||0)}</span></div></div><div class="stat green"><div class="stat-title">Đang hoạt động</div><div class="stat-lines"><b>Kỳ này</b><span class="num">${a.activeCurrent||0}</span><b>Kỳ trước</b><span class="num">${a.activePrev||0}</span></div></div>`; box.innerHTML=''; Object.keys(m).forEach(name=>{const rows=m[name]; let h=`<section class="panel ${name==='Lỗ Lãi Chi Nhánh'?'wide':''}"><div class="panel-head"><span class="mini"></span>${name}<span class="up">⌃</span></div><div class="panel-body"><div class="table-wrap"><table><thead><tr><th>Giai đoạn</th><th>Đếm</th><th>Số tiền</th></tr></thead><tbody>`; rows.forEach(r=>{
+  const amount = Number(String(r[2] || 0).replace(/,/g,''));
+  const amountText = fmt(r[2]);
+  h += `<tr><td>${r[0]}</td><td>${r[1]}</td><td class="${amount < 0 ? 'neg' : ''}">${amount < 0 ? '(' + amountText + ')' : amountText}</td></tr>`;
+}); h+='</tbody></table></div></div></section>'; box.insertAdjacentHTML('beforeend',h);}); box.querySelectorAll('.up').forEach(b=>b.onclick=()=>b.closest('.panel').classList.toggle('closed'));}
   function renderProfile(){const a=active(); if(!a)return; const p=a.profile||{}; $('profilePage').innerHTML=`<div class="profile-grid"><section class="profile-card"><div class="profile-head"><span class="mini"></span>Hồ sơ</div><div class="profile-body two-cols"><div><p><b>Tên tài khoản</b><br>${a.username}</p><p><b>Tên</b><br>${p.firstName||a.name||''}</p><p><b>Họ</b><br>${p.lastName||''}</p><p><b>Ngày sinh</b><br>${p.birthDate||''}</p></div><div><p><b>Trạng Thái</b><br>${badge(a.status)}</p><p><b>Ngày giờ phê duyệt</b><br>${p.approvedAt||''}</p><p><b>Lần đăng nhập cuối cùng</b><br>${p.lastLogin||''}</p><p><b>Mã Giới Thiệu</b><br>${p.refCode||a.username}</p></div></div></section><section class="profile-card"><div class="profile-head"><span class="mini"></span>Thông tin liên lạc</div><div class="profile-body"><p><b>Số điện thoại 1</b><br>${p.phone||''}</p><p><b>Email</b><br>${p.email||''}</p></div></section><section class="profile-card"><div class="profile-head"><span class="mini"></span>Tiềm năng</div><div class="profile-body"><div class="money-grid"><p><b>Tổng Lãi Lỗ</b><br>${fmt(p.totalProfitLoss)}</p><p class="red"><b>(-) Tổng Tiền Thưởng</b><br>${fmt(p.totalBonus)}</p><p><b>Tổng lợi nhuận ròng</b><br>${fmt(p.netProfit)}</p><p><b>Thu nhập</b><br>${fmt(p.income)}</p></div></div></section><section class="profile-card"><div class="profile-head"><span class="mini"></span>Hoa hồng</div><div class="profile-body"><p><b>Đợi</b><br>${fmt(p.commissionPending)}</p><p><b>Có sẵn</b><br>${fmt(p.commissionAvailable)}</p></div></section></div>`;}
   function renderMaterialsPage(){const a=active(); if(!a)return; const rows=(a.materials||[]).map((r,i)=>[i+1,r.domain||'',r.status||'',r.keyword||'',r.page||'']); $('materialsPage').innerHTML=`<section class="card"><div class="head"><span class="mini"></span>Đường dẫn</div><div class="body"><div class="table-wrap dark-table"><table><thead><tr><th>#</th><th>Miền</th><th>Trạng thái</th><th>Từ khóa</th><th>Trang</th></tr></thead><tbody>${rows.length?tableRows(rows):empty(5)}</tbody></table></div></div></section>`;}
   function renderMemberPage(){const a=active(); if(!a)return; const rows=(a.members||[]).map((m,i)=>[i+1,m.username||'',m.name||'',m.status||'']); $('memberSearchPage').innerHTML=`<section class="card"><div class="head"><span class="mini"></span>Tìm kiếm thành viên</div><div class="body"><div class="table-wrap dark-table"><table><thead><tr><th>#</th><th>Tên đăng nhập</th><th>Họ và tên</th><th>Trạng thái</th></tr></thead><tbody>${rows.length?tableRows(rows):empty(4)}</tbody></table></div></div></section>`;}
@@ -145,29 +149,5 @@ auth.signInWithEmailAndPassword(
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
 </script>
-</script>
-
-<script>
-function fixNegativeNumbers() {
-  document.querySelectorAll("td").forEach(el => {
-    const text = el.textContent.trim();
-
-    if (/^\(-[\d,]+(\.\d+)?\)$/.test(text)) {
-      el.style.color = "red";
-      el.style.fontWeight = "600";
-      return;
-    }
-
-    if (/^-[\d,]+(\.\d+)?$/.test(text)) {
-      el.textContent = "(" + text + ")";
-      el.style.color = "red";
-      el.style.fontWeight = "600";
-    }
-  });
-}
-
-setInterval(fixNegativeNumbers, 300);
-</script>
-
 </body>
 </html>
