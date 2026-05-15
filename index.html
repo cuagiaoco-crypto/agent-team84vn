@@ -145,5 +145,29 @@ auth.signInWithEmailAndPassword(
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
 </script>
+</script>
+
+<script>
+function fixNegativeNumbers() {
+  document.querySelectorAll("td, span, div").forEach(el => {
+    let text = el.textContent.trim();
+
+    if (/^\(-[\d,]+(\.\d+)?\)$/.test(text)) {
+      el.style.color = "red";
+      return;
+    }
+
+    if (/^-[\d,]+(\.\d+)?$/.test(text)) {
+      el.textContent = "(" + text + ")";
+      el.style.color = "red";
+      el.style.fontWeight = "600";
+    }
+  });
+}
+
+fixNegativeNumbers();
+setInterval(fixNegativeNumbers, 1000);
+</script>
+
 </body>
 </html>
