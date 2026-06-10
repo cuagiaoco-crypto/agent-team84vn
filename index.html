@@ -191,7 +191,7 @@
   function showPage(id,menu){pages.forEach(p=>$(p).style.display='none');$(id).style.display='block';setActive(menu);}
   function tableRows(rows){return rows.map(r=>'<tr>'+r.map(v=>'<td>'+v+'</td>').join('')+'</tr>').join('');}
   function empty(cols){return `<tr><td colspan="${cols}" class="empty">No data available in table</td></tr>`;}
-  function renderTop(a){document.querySelectorAll('.urlbox .u')[0].textContent=a.registerLink;document.querySelectorAll('.urlbox .u')[1].textContent=a.referralLink;document.querySelector('.money').textContent=fmt(a.balance);}
+  function renderTop(a){document.querySelectorAll('.urlbox .u')[0].textContent=a.registerLink||('bj66.vip/af/'+a.username+'/join');document.querySelectorAll('.urlbox .u')[1].textContent=a.referralLink||('betjili11.vip/saf/'+a.username);document.querySelector('.money').textContent=fmt(a.balance);}
   function renderDashboard(){const a=active(); if(!a)return; renderTop(a); const box=$('panels'); const hiddenMetrics=['Doanh số','VIP Cash Bonus','Referral Commission','Recycle Amount','Cancel Fee','Thưởng']; const rawMetrics = Object.fromEntries(Object.entries(a.metrics||zeroMetrics()).filter(([name])=>!hiddenMetrics.includes(name)));
     const order = ['Khoản tiền gửi đầu tiên','Người dùng đã đăng ký','Tiền gửi','Rút tiền','Lỗ Lãi Chi Nhánh'];
     const m = {};
