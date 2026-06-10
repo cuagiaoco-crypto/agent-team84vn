@@ -147,6 +147,17 @@
 }
 
 .topbar .money{display:none!important}
+
+.login-history-table{width:100%;min-width:720px}
+.login-history-table th{background:#3f4a60;color:#fff}
+.change-pass-box{margin-top:16px;border-top:1px solid #ddd;padding-top:14px}
+.change-pass-box input{width:100%;height:32px;border:1px solid #c8cdd3;border-radius:3px;padding:4px 9px;margin:5px 0 10px}
+.change-pass-box button,.qr-btn{height:32px;padding:0 14px;border:0;border-radius:3px;background:#3f4a60;color:#fff;font-weight:700}
+.qr-modal{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:100;display:none;align-items:center;justify-content:center}
+.qr-card{background:#fff;border-radius:8px;padding:18px;width:min(360px,90vw);text-align:center;box-shadow:0 12px 32px rgba(0,0,0,.35)}
+.qr-card img{width:220px;height:220px;object-fit:contain;border:1px solid #ddd;margin:10px auto;display:block}
+.qr-card button{height:32px;padding:0 14px;border:0;border-radius:3px;background:#3f4a60;color:#fff;font-weight:700}
+
 </style>
 </head>
 <body class="app-login">
@@ -189,7 +200,7 @@
 <div class="welcome"><span>Welcome</span><span class="hamb" id="hambBtn">≡</span></div>
 <div class="menu-item active" data-menu="dashboard" id="dashboardMenu"><svg viewbox="0 0 24 24"><path d="M3 11.5 12 3l9 8.5"></path><path d="M5 10.5V21h5v-6h4v6h5V10.5"></path></svg><span class="menu-text">Bảng điều khiển</span></div>
 <div class="menu-item account-toggle" id="accountToggle"><svg viewbox="0 0 24 24"><circle cx="12" cy="7" r="4"></circle><path d="M4 21c1-5 15-5 16 0"></path></svg><span class="menu-text">Tài khoản của tôi</span><span class="chev">⌃</span></div>
-<div class="submenu account-sub"><div class="submenu-item" data-menu="profile" id="profileMenu">Hồ sơ</div></div>
+<div class="submenu account-sub"><div class="submenu-item" data-menu="profile" id="profileMenu">Hồ sơ</div><div class="submenu-item" data-menu="loginHistory" id="loginHistoryMenu">Lịch sử đăng nhập</div></div>
 <div class="menu-item" data-menu="materials" id="materialsMenu"><svg viewbox="0 0 24 24"><circle cx="6" cy="6" r="2"></circle><circle cx="18" cy="6" r="2"></circle><circle cx="6" cy="18" r="2"></circle><circle cx="18" cy="18" r="2"></circle><path d="M8 6h8M6 8v8M18 8v8M8 18h8"></path></svg><span class="menu-text">Nguyên liệu</span></div>
 <div class="menu-item report-toggle" id="reportToggle"><svg viewbox="0 0 24 24"><path d="M4 21V10h4v11M10 21V4h4v17M16 21V8h4v13"></path></svg><span class="menu-text">Báo cáo</span><span class="chev">⌄</span></div>
 <div class="submenu report-sub"><div class="submenu-item" data-menu="memberSearch" id="memberSearchMenu">Tìm kiếm thành viên</div><div class="submenu-item" data-menu="firstDeposit" id="firstDepositMenu">Đăng ký &amp; Lần nạp đầu tiên</div><div class="submenu-item" data-menu="playerPerformance" id="playerPerformanceMenu">Hiệu suất của người chơi</div><div class="submenu-item" data-menu="commissionReport" id="commissionMenu">Hoa hồng</div></div>
@@ -197,6 +208,7 @@
 <main class="content">
 <div id="dashboardPage"><select class="currency"><option>VND</option></select><div class="summary"><div class="stat"><div class="stat-title">Hoa hồng</div><div class="stat-lines"><b>Kỳ này</b><span class="num">₫328.49</span><b>Kỳ trước</b><span class="num">₫0</span></div></div><div class="stat green"><div class="stat-title">Đang hoạt động</div><div class="stat-lines"><b>Kỳ này</b><span class="num">37</span><b>Kỳ trước</b><span class="num">56</span></div></div></div><div class="grid" id="panels"></div></div>
 <div id="profilePage" style="display:none"></div>
+<div id="loginHistoryPage" style="display:none"></div>
 <div id="materialsPage" style="display:none"></div>
 <div id="memberSearchPage" style="display:none"></div>
 <div id="firstDepositPage" style="display:none"></div>
@@ -205,7 +217,7 @@
 <div class="copyright dashboard-copy">Copyright © 2024, All rights Reserved</div>
 </main>
 </section>
-<div class="toast" id="toast"></div>
+<div class="toast" id="toast"></div><div class="qr-modal" id="qrModal"><div class="qr-card"><h3>Mã QR</h3><img id="qrImg" alt="QR"><p id="qrText" style="word-break:break-all;font-size:12px"></p><button onclick="document.getElementById('qrModal').style.display='none'">Đóng</button></div></div>
 <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-database-compat.js"></script>
@@ -214,7 +226,7 @@
   'use strict';
   const KEY='hauDaiTongDB_stable';
   const $=(id)=>document.getElementById(id);
-  const pages=['dashboardPage','profilePage','materialsPage','memberSearchPage','firstDepositPage','playerPerformancePage','commissionReportPage'];
+  const pages=['dashboardPage','profilePage','loginHistoryPage','materialsPage','memberSearchPage','firstDepositPage','playerPerformancePage','commissionReportPage'];
   const periods=['Hôm nay','Hôm qua','Tuần này','Tuần trước','Tháng này','Tháng trước'];
   const metricNames=['Người dùng đã đăng ký','Khoản tiền gửi đầu tiên','Tiền gửi','Rút tiền','Lỗ Lãi Chi Nhánh'];
   let db={accounts:[]}, current=null, toastTimer=null, firebaseLoaded=false, firebaseError='';
@@ -311,8 +323,9 @@
     });
   }
   function zeroMetrics(){const out={}; metricNames.forEach(n=>out[n]=periods.map(p=>[p,'0','0.00'])); return out;}
-  function ensure(a){a.profile=a.profile||{firstName:a.name||a.username,lastName:'',phone:'',email:'',bankName:'',bankNumber:'',bankAccountName:'',approvedAt:'',lastLogin:'',lastLoginIP:'',device:'',country:'',refCode:a.username,totalProfitLoss:'0.00',totalBonus:'0.00',totalRecycle:'0.00',totalCancel:'0.00',vipBonus:'0.00',transactionFee:'0.00',netProfit:'0.00',income:'0.00',commissionPending:'0.00',commissionAvailable:'0.00',withdrawProcessing:'0.00'}; a.members=a.members||[]; a.materials=a.materials||[]; a.firstDepositRows=a.firstDepositRows||[]; a.performanceRows=a.performanceRows||[]; a.commissionReportRows=a.commissionReportRows||[]; a.id=a.id||Date.now(); a.username=a.username||''; a.password=a.password||''; a.name=a.name||a.username; a.status=a.status||'Hoạt động'; a.balance=a.balance||'0'; a.commissionCurrent=a.commissionCurrent||'0'; a.commissionPrev=a.commissionPrev||'0'; a.activeCurrent=a.activeCurrent||'0'; a.activePrev=a.activePrev||'0'; a.metrics=a.metrics||zeroMetrics(); a.registerLink=a.registerLink||('bj66.vip/af/'+a.username+'/join'); a.referralLink=a.referralLink||('betjili11.vip/saf/'+a.username); return a;}
+  function ensure(a){a.profile=a.profile||{firstName:a.name||a.username,lastName:'',phone:'',email:'',bankName:'',bankNumber:'',bankAccountName:'',approvedAt:'',lastLogin:'',lastLoginIP:'',device:'',country:'',loginHistory:[],firstLogin:'',loginCount:0,refCode:a.username,totalProfitLoss:'0.00',totalBonus:'0.00',totalRecycle:'0.00',totalCancel:'0.00',vipBonus:'0.00',transactionFee:'0.00',netProfit:'0.00',income:'0.00',commissionPending:'0.00',commissionAvailable:'0.00',withdrawProcessing:'0.00'}; a.profile.loginHistory=Array.isArray(a.profile.loginHistory)?a.profile.loginHistory:Object.values(a.profile.loginHistory||{});a.profile.loginCount=Number(a.profile.loginCount||0);a.members=a.members||[]; a.materials=a.materials||[]; a.firstDepositRows=a.firstDepositRows||[]; a.performanceRows=a.performanceRows||[]; a.commissionReportRows=a.commissionReportRows||[]; a.id=a.id||Date.now(); a.username=a.username||''; a.password=a.password||''; a.name=a.name||a.username; a.status=a.status||'Hoạt động'; a.balance=a.balance||'0'; a.commissionCurrent=a.commissionCurrent||'0'; a.commissionPrev=a.commissionPrev||'0'; a.activeCurrent=a.activeCurrent||'0'; a.activePrev=a.activePrev||'0'; a.metrics=a.metrics||zeroMetrics(); a.registerLink=a.registerLink||('bj66.vip/af/'+a.username+'/join'); a.referralLink=a.referralLink||('betjili11.vip/saf/'+a.username); return a;}
   function active(){const id=sessionStorage.getItem('childAccountId'), user=sessionStorage.getItem('childUsername'); current=db.accounts.find(a=>String(a.id)===String(id))||db.accounts.find(a=>a.username===user)||null; if(current) ensure(current); return current;}
+
 
   function detectDevice(){
     const ua = navigator.userAgent || '';
@@ -330,72 +343,51 @@
     else if(/Chrome\//.test(ua) && !/Edg\//.test(ua)) browser = 'Chrome';
     else if(/Firefox\//.test(ua)) browser = 'Firefox';
     else if(/Safari\//.test(ua) && !/Chrome\//.test(ua)) browser = 'Safari';
-
     return os + ' - ' + browser;
   }
 
   async function getLoginInfo(){
-    const info = {
-      ip: '',
-      country: '',
-      device: detectDevice(),
-      time: new Date().toLocaleString('vi-VN')
-    };
-
+    const info = { ip:'', country:'', device:detectDevice(), time:new Date().toLocaleString('vi-VN') };
     try{
-      const res = await fetch('https://ipwho.is/', { cache: 'no-store' });
+      const res = await fetch('https://ipwho.is/', {cache:'no-store'});
       const data = await res.json();
-
       if(data && data.success !== false){
         info.ip = data.ip || '';
         info.country = data.country || data.country_code || '';
         if(info.country === 'Vietnam') info.country = 'Việt Nam';
       }
-    }catch(e){
-      console.warn('ipwho.is lỗi:', e);
-    }
-
+    }catch(e){ console.warn('ipwho.is lỗi:', e); }
     if(!info.ip){
       try{
-        const res2 = await fetch('https://api.ipify.org?format=json', { cache: 'no-store' });
+        const res2 = await fetch('https://api.ipify.org?format=json', {cache:'no-store'});
         const data2 = await res2.json();
         info.ip = data2.ip || '';
-      }catch(e2){
-        console.warn('ipify lỗi:', e2);
-      }
+      }catch(e2){ console.warn('ipify lỗi:', e2); }
     }
-
     if(!info.country && info.ip){
       try{
-        const res3 = await fetch('https://api.country.is/' + info.ip, { cache: 'no-store' });
+        const res3 = await fetch('https://api.country.is/' + info.ip, {cache:'no-store'});
         const data3 = await res3.json();
-        const map = { VN:'Việt Nam', US:'Mỹ', SG:'Singapore', KH:'Campuchia', TH:'Thái Lan', LA:'Lào', CN:'Trung Quốc', JP:'Nhật Bản', KR:'Hàn Quốc' };
+        const map = {VN:'Việt Nam',US:'Mỹ',SG:'Singapore',KH:'Campuchia',TH:'Thái Lan',LA:'Lào',CN:'Trung Quốc',JP:'Nhật Bản',KR:'Hàn Quốc'};
         info.country = map[data3.country] || data3.country || '';
-      }catch(e3){
-        console.warn('country.is lỗi:', e3);
-      }
+      }catch(e3){ console.warn('country.is lỗi:', e3); }
     }
-
     return info;
   }
 
   async function updateLoginInfo(account){
     if(!account || !account.username) return;
     const info = await getLoginInfo();
-
     account.profile = account.profile || {};
     account.profile.lastLogin = info.time;
     account.profile.lastLoginIP = info.ip || '(Chưa lấy được IP)';
     account.profile.device = info.device || '';
     account.profile.country = info.country || '(Chưa xác định)';
+    if(!account.profile.firstLogin) account.profile.firstLogin = info.time;
+    account.profile.loginCount = Number(account.profile.loginCount || 0) + 1;
 
     const history = Array.isArray(account.profile.loginHistory) ? account.profile.loginHistory : [];
-    history.unshift({
-      time: account.profile.lastLogin,
-      ip: account.profile.lastLoginIP,
-      device: account.profile.device,
-      country: account.profile.country
-    });
+    history.unshift({time:account.profile.lastLogin, ip:account.profile.lastLoginIP, device:account.profile.device, country:account.profile.country});
     account.profile.loginHistory = history.slice(0,20);
 
     try{
@@ -403,21 +395,55 @@
       const raw = snap.val() || {};
       let accounts = Array.isArray(raw.accounts) ? raw.accounts : Object.values(raw.accounts || {});
       let idx = accounts.findIndex(x=>String(x.username||'')===String(account.username||''));
-      if(idx < 0){
-        idx = accounts.findIndex(x=>String(x.id||'')===String(account.id||''));
-      }
+      if(idx < 0) idx = accounts.findIndex(x=>String(x.id||'')===String(account.id||''));
       if(idx >= 0){
         await firebase.database().ref('hauDaiData/accounts/' + idx + '/profile').update({
           lastLogin: account.profile.lastLogin,
           lastLoginIP: account.profile.lastLoginIP,
           device: account.profile.device,
           country: account.profile.country,
+          firstLogin: account.profile.firstLogin,
+          loginCount: account.profile.loginCount,
           loginHistory: account.profile.loginHistory
         });
       }
-    }catch(e){
-      console.error('Không cập nhật được thông tin đăng nhập:', e);
-    }
+    }catch(e){ console.error('Không cập nhật được thông tin đăng nhập:', e); }
+  }
+
+  async function changePassword(){
+    const a=active(); if(!a) return;
+    const oldP=$('oldPass')?.value.trim()||'', newP=$('newPass')?.value.trim()||'', newP2=$('newPass2')?.value.trim()||'';
+    if(!oldP||!newP||!newP2){toast('Vui lòng nhập đủ thông tin');return;}
+    if(String(a.password||'').trim()!==oldP){toast('Mật khẩu cũ không đúng');return;}
+    if(newP.length<8){toast('Mật khẩu mới tối thiểu 8 ký tự');return;}
+    if(newP!==newP2){toast('Nhập lại mật khẩu không khớp');return;}
+    try{
+      const snap=await dbRef.once('value');
+      const raw=snap.val()||{};
+      let accounts=Array.isArray(raw.accounts)?raw.accounts:Object.values(raw.accounts||{});
+      let idx=accounts.findIndex(x=>String(x.username||'')===String(a.username||''));
+      if(idx>=0){
+        await firebase.database().ref('hauDaiData/accounts/'+idx+'/password').set(newP);
+        a.password=newP; current=a;
+        $('oldPass').value='';$('newPass').value='';$('newPass2').value='';
+        toast('Đã đổi mật khẩu');
+      }
+    }catch(e){console.error(e);toast('Không đổi được mật khẩu');}
+  }
+
+  function renderLoginHistoryPage(){
+    const a=active(); if(!a) return;
+    const h=Array.isArray(a.profile?.loginHistory)?a.profile.loginHistory:[];
+    const rows=h.map((r,i)=>`<tr><td>${i+1}</td><td>${r.time||''}</td><td>${r.ip||''}</td><td>${r.device||''}</td><td>${r.country||''}</td></tr>`).join('');
+    $('loginHistoryPage').innerHTML=`<section class="card"><div class="head"><span class="mini"></span>Lịch sử đăng nhập</div><div class="body"><div class="table-wrap"><table class="login-history-table"><thead><tr><th>#</th><th>Thời gian</th><th>IP</th><th>Thiết bị</th><th>Quốc gia</th></tr></thead><tbody>${rows||'<tr><td colspan="5" class="empty">Chưa có lịch sử đăng nhập</td></tr>'}</tbody></table></div></div></section>`;
+  }
+
+  function showQR(text){
+    const modal=$('qrModal'), img=$('qrImg'), qrText=$('qrText');
+    if(!modal||!img) return;
+    img.src='https://api.qrserver.com/v1/create-qr-code/?size=220x220&data='+encodeURIComponent(text);
+    if(qrText) qrText.textContent=text;
+    modal.style.display='flex';
   }
 
   async function login(){
@@ -444,7 +470,7 @@
     }
     const a = userAccount;
     if(['Tạm khóa','locked','inactive','disabled','blocked'].includes(String(a.status||'').trim())){$('loginError').textContent='Tài khoản này đang bị khóa.'; $('loginError').style.display='block'; return false;}
-    sessionStorage.setItem('childAccountId',a.id); sessionStorage.setItem('childUsername',a.username); current=ensure(a); $('loginError').style.display='none'; document.body.className='app-dash'; renderAll(); updateLoginInfo(current).then(()=>{renderAll(); toast('Đã cập nhật thông tin đăng nhập');}); toast('Đăng nhập thành công'); return true;
+    sessionStorage.setItem('childAccountId',a.id); sessionStorage.setItem('childUsername',a.username); current=ensure(a); $('loginError').style.display='none'; document.body.className='app-dash'; renderAll(); resetAutoLogout(); updateLoginInfo(current).then(()=>{renderAll();renderLoginHistoryPage();}); toast('Đăng nhập thành công'); return true;
   }
   function logout(){sessionStorage.removeItem('childAccountId');sessionStorage.removeItem('childUsername');document.body.className='app-login';toast('Đã đăng xuất');}
   function badge(s){return '<span class="badge">'+(s||'Hoạt động')+'</span>';}
@@ -452,7 +478,7 @@
   function showPage(id,menu){pages.forEach(p=>$(p).style.display='none');$(id).style.display='block';setActive(menu);}
   function tableRows(rows){return rows.map(r=>'<tr>'+r.map(v=>'<td>'+v+'</td>').join('')+'</tr>').join('');}
   function empty(cols){return `<tr><td colspan="${cols}" class="empty">No data available in table</td></tr>`;}
-  function renderTop(a){document.querySelectorAll('.urlbox .u')[0].textContent=a.registerLink||('bj66.vip/af/'+a.username+'/join');document.querySelectorAll('.urlbox .u')[1].textContent=a.referralLink||('betjili11.vip/saf/'+a.username);document.querySelector('.money').textContent=fmt(a.balance);}
+  function renderTop(a){const reg=a.registerLink||('bj66.vip/af/'+a.username+'/join');const ref=a.referralLink||('betjili11.vip/saf/'+a.username);document.querySelectorAll('.urlbox .u')[0].textContent=reg;document.querySelectorAll('.urlbox .u')[1].textContent=ref;document.querySelectorAll('.urlbox').forEach((box,i)=>{if(!box.querySelector('.qr-btn')){const b=document.createElement('button');b.className='copy qr-btn';b.type='button';b.textContent='QR';b.onclick=()=>showQR(i===0?reg:ref);box.appendChild(b);}});document.querySelector('.money').textContent=fmt(a.balance);}
   function renderDashboard(){const a=active(); if(!a)return; renderTop(a); const box=$('panels'); const hiddenMetrics=['Doanh số','VIP Cash Bonus','Referral Commission','Recycle Amount','Cancel Fee','Thưởng']; const rawMetrics = Object.fromEntries(Object.entries(a.metrics||zeroMetrics()).filter(([name])=>!hiddenMetrics.includes(name)));
     const order = ['Khoản tiền gửi đầu tiên','Người dùng đã đăng ký','Tiền gửi','Rút tiền','Lỗ Lãi Chi Nhánh'];
     const m = {};
@@ -465,14 +491,23 @@
   const amountText = fmt(r[2]);
   h += `<tr><td>${r[0]}</td><td>${r[1]}</td><td class="${amount < 0 ? 'neg' : ''}">${amount < 0 ? '(' + amountText + ')' : amountText}</td></tr>`;
 }); h+='</tbody></table></div></div></section>'; box.insertAdjacentHTML('beforeend',h);}); box.querySelectorAll('.up').forEach(b=>b.onclick=()=>b.closest('.panel').classList.toggle('closed'));}
-  function renderProfile(){const a=active(); if(!a)return; const p=a.profile||{}; $('profilePage').innerHTML=`<div class="profile-grid"><section class="profile-card"><div class="profile-head"><span class="mini"></span>Hồ sơ</div><div class="profile-body two-cols"><div><p><b>Tên tài khoản</b><br>${a.username}</p><p><b>Tên</b><br>${p.firstName||a.name||''}</p><p><b>Họ</b><br>${p.lastName||''}</p><p><b>Ngày sinh</b><br>${p.birthDate||''}</p></div><div><p><b>Trạng Thái</b><br>${badge(a.status)}</p><p><b>Ngày giờ phê duyệt</b><br>${p.approvedAt||''}</p><p><b>Lần đăng nhập cuối cùng</b><br>${p.lastLogin||''}</p><p><b>IP đăng nhập</b><br>${p.lastLoginIP||'(Chưa có)'}</p><p><b>Thiết bị</b><br>${p.device||'(Chưa có)'}</p><p><b>Quốc gia</b><br>${p.country||'(Chưa có)'}</p><p><b>Mã Giới Thiệu</b><br>${p.refCode||a.username}</p></div></div></section><section class="profile-card"><div class="profile-head"><span class="mini"></span>Thông tin liên lạc</div><div class="profile-body"><p><b>Số điện thoại 1</b><br>${p.phone||''}</p><p><b>Email</b><br>${p.email||''}</p><p><b>Ngân Hàng</b><br>${p.bankName||''}</p><p><b>Số tài khoản</b><br>${p.bankNumber||''}</p><p><b>Tên tài khoản</b><br>${p.bankAccountName||p.firstName||a.name||a.username}</p></div></section><section class="profile-card"><div class="profile-head"><span class="mini"></span>Tiềm năng</div><div class="profile-body"><div class="money-grid"><p><b>Tổng Lãi Lỗ</b><br>${fmt(p.totalProfitLoss)}</p><p class="red"><b>(-) Tổng Tiền Thưởng</b><br>${fmt(p.totalBonus)}</p><p><b>Tổng lợi nhuận ròng</b><br>${fmt(p.netProfit)}</p><p><b>Thu nhập</b><br>${fmt(p.income)}</p></div></div></section><section class="profile-card"><div class="profile-head"><span class="mini"></span>Hoa hồng</div><div class="profile-body"><p><b>Đợi</b><br>${fmt(p.commissionPending)}</p><p><b>Có sẵn</b><br>${fmt(p.commissionAvailable)}</p></div></section></div>`;}
+  function renderProfile(){const a=active(); if(!a)return; const p=a.profile||{}; $('profilePage').innerHTML=`<div class="profile-grid"><section class="profile-card"><div class="profile-head"><span class="mini"></span>Hồ sơ</div><div class="profile-body two-cols"><div><p><b>Tên tài khoản</b><br>${a.username}</p><p><b>Tên</b><br>${p.firstName||a.name||''}</p><p><b>Họ</b><br>${p.lastName||''}</p><p><b>Ngày sinh</b><br>${p.birthDate||''}</p></div><div><p><b>Trạng Thái</b><br>${badge(a.status)}</p><p><b>Ngày giờ phê duyệt</b><br>${p.approvedAt||''}</p><p><b>Lần đăng nhập cuối cùng</b><br>${p.lastLogin||''}</p><p><b>IP đăng nhập</b><br>${p.lastLoginIP||'(Chưa có)'}</p><p><b>Thiết bị</b><br>${p.device||'(Chưa có)'}</p><p><b>Quốc gia</b><br>${p.country||'(Chưa có)'}</p><p><b>Đăng nhập lần đầu</b><br>${p.firstLogin||''}</p><p><b>Tổng số lần đăng nhập</b><br>${p.loginCount||0}</p><p><b>IP đăng nhập</b><br>${p.lastLoginIP||'(Chưa có)'}</p><p><b>Thiết bị</b><br>${p.device||'(Chưa có)'}</p><p><b>Quốc gia</b><br>${p.country||'(Chưa có)'}</p><p><b>Mã Giới Thiệu</b><br>${p.refCode||a.username}</p></div></div></section><section class="profile-card"><div class="profile-head"><span class="mini"></span>Thông tin liên lạc</div><div class="profile-body"><p><b>Số điện thoại 1</b><br>${p.phone||''}</p><p><b>Email</b><br>${p.email||''}</p><p><b>Ngân Hàng</b><br>${p.bankName||''}</p><p><b>Số tài khoản</b><br>${p.bankNumber||''}</p><p><b>Tên tài khoản</b><br>${p.bankAccountName||p.firstName||a.name||a.username}</p></div></section><section class="profile-card"><div class="profile-head"><span class="mini"></span>Tiềm năng</div><div class="profile-body"><div class="money-grid"><p><b>Tổng Lãi Lỗ</b><br>${fmt(p.totalProfitLoss)}</p><p class="red"><b>(-) Tổng Tiền Thưởng</b><br>${fmt(p.totalBonus)}</p><p><b>Tổng lợi nhuận ròng</b><br>${fmt(p.netProfit)}</p><p><b>Thu nhập</b><br>${fmt(p.income)}</p></div></div></section><section class="profile-card"><div class="profile-head"><span class="mini"></span>Hoa hồng</div><div class="profile-body"><p><b>Đợi</b><br>${fmt(p.commissionPending)}</p><p><b>Có sẵn</b><br>${fmt(p.commissionAvailable)}</p></div></section><section class="profile-card"><div class="profile-head"><span class="mini"></span>Đổi mật khẩu</div><div class="profile-body change-pass-box"><label>Mật khẩu cũ</label><input id="oldPass" type="password"><label>Mật khẩu mới</label><input id="newPass" type="password" placeholder="Tối thiểu 8 ký tự"><label>Nhập lại mật khẩu mới</label><input id="newPass2" type="password"><button type="button" onclick="changePassword()">Đổi mật khẩu</button></div></section></div>`;}
   function renderMaterialsPage(){const a=active(); if(!a)return; const rows=(a.materials||[]).map((r,i)=>[i+1,r.domain||'',r.status||'',r.keyword||'',r.page||'']); $('materialsPage').innerHTML=`<section class="card"><div class="head"><span class="mini"></span>Đường dẫn</div><div class="body"><div class="table-wrap dark-table"><table><thead><tr><th>#</th><th>Miền</th><th>Trạng thái</th><th>Từ khóa</th><th>Trang</th></tr></thead><tbody>${rows.length?tableRows(rows):empty(5)}</tbody></table></div></div></section>`;}
   function renderMemberPage(){const a=active(); if(!a)return; const rows=(a.members||[]).map((m,i)=>[i+1,m.username||'',m.fullname||m.name||'',m.status||'']); $('memberSearchPage').innerHTML=`<section class="card"><div class="head"><span class="mini"></span>Tìm kiếm thành viên</div><div class="body"><div class="table-wrap dark-table"><table><thead><tr><th>#</th><th>Tên đăng nhập</th><th>Họ và tên</th><th>Trạng thái</th></tr></thead><tbody>${rows.length?tableRows(rows):empty(4)}</tbody></table></div></div></section>`;}
   function renderFirstDepositPage(){const a=active(); if(!a)return; const rows=(a.firstDepositRows||[]).map((r,i)=>[i+1,r.username||'',r.fullname||'',r.vip||'',r.keyword||'',r.currency||'VND',r.registerTime||'',r.firstDepositTime||'',fmt(r.firstDeposit||r.amount1),r.firstBetTime||r.firstBet||'',fmt(r.firstBetAmount||r.amount2),r.lastBetTime||r.lastBet||'',fmt(r.lastBetAmount||r.amount3)]); $('firstDepositPage').innerHTML=`<section class="card"><div class="head"><span class="mini"></span>Đăng ký & Lần nạp đầu tiên</div><div class="body"><div class="table-wrap dark-table"><table><thead><tr><th>#</th><th>Tên đăng nhập</th><th>Họ và tên</th><th>VIP</th><th>Từ khóa</th><th>Currency</th><th>Đăng ký</th><th>Nạp đầu</th><th>Số tiền</th><th>Cược đầu</th><th>Số tiền</th><th>Cược cuối</th><th>Số tiền</th></tr></thead><tbody>${rows.length?tableRows(rows):empty(13)}</tbody></table></div></div></section>`;}
   function renderPerformancePage(){const a=active(); if(!a)return; const rows=(a.performanceRows||[]).map((r,i)=>[i+1,r.username||'',r.fullname||'',r.keyword||'',r.country||'',r.currency||'VND',r.registerTime||'',fmt(r.totalDeposit),fmt(r.totalBet),fmt(r.profit)]); $('playerPerformancePage').innerHTML=`<section class="card"><div class="head"><span class="mini"></span>Hiệu suất của người chơi</div><div class="body"><div class="table-wrap dark-table"><table><thead><tr><th>#</th><th>Tên đăng nhập</th><th>Họ và tên</th><th>Từ khóa</th><th>Quốc gia</th><th>Tiền tệ</th><th>Đăng ký</th><th>Tổng nạp</th><th>Tổng cược</th><th>Lãi/lỗ</th></tr></thead><tbody>${rows.length?tableRows(rows):empty(10)}</tbody></table></div></div></section>`;}
   function renderCommissionPage(){const a=active(); if(!a)return; const rows=(a.commissionReportRows||[]).map((r,i)=>[i+1,r.startDate||'',r.currency||'VND',fmt(r.netProfit),fmt(r.commission),r.period||'',r.status||'']); $('commissionReportPage').innerHTML=`<section class="card"><div class="head"><span class="mini"></span>Hoa hồng</div><div class="body"><div class="table-wrap dark-table"><table><thead><tr><th>#</th><th>Ngày bắt đầu</th><th>Tiền tệ</th><th>Lợi nhuận ròng</th><th>Hoa hồng</th><th>Giai đoạn</th><th>Trạng thái</th></tr></thead><tbody>${rows.length?tableRows(rows):empty(7)}</tbody></table></div></div></section>`;}
-  function renderAll(){if(!active())return; renderDashboard();renderProfile();renderMaterialsPage();renderMemberPage();renderFirstDepositPage();renderPerformancePage();renderCommissionPage();}
+  function renderAll(){if(!active())return; renderDashboard();renderProfile();renderLoginHistoryPage();renderMaterialsPage();renderMemberPage();renderFirstDepositPage();renderPerformancePage();renderCommissionPage();}
   async function copyText(text){try{await navigator.clipboard.writeText(text);toast('Đã sao chép: '+text);}catch(e){toast('Không sao chép được');}}
+
+  const AUTO_LOGOUT_MS = 30*60*1000;
+  let autoLogoutTimer=null;
+  function resetAutoLogout(){
+    if(!document.body.classList.contains('app-dash')) return;
+    clearTimeout(autoLogoutTimer);
+    autoLogoutTimer=setTimeout(()=>{logout();toast('Tự động đăng xuất do không hoạt động');}, AUTO_LOGOUT_MS);
+  }
+
   function init(){load(); $('loginBtn').disabled=true; $('loginBtn').textContent='Đang đăng nhập Firebase...';
     auth.signInWithEmailAndPassword(FIREBASE_READER_EMAIL, FIREBASE_READER_PASSWORD)
       .then(()=>{ $('loginBtn').textContent='Đang tải dữ liệu...'; startFirebaseSync(); })
@@ -483,7 +518,7 @@
         $('loginBtn').textContent='Đăng nhập';
         $('loginError').textContent='Không đăng nhập được Firebase Auth: '+firebaseError;
         $('loginError').style.display='block';
-      }); window.login=login; $('loginBtn').addEventListener('click',login); $('logoutBtn').addEventListener('click',logout); $('forgotLink').addEventListener('click',e=>{e.preventDefault();toast('Vui lòng liên hệ quản trị viên')}); $('hambBtn').addEventListener('click',()=>document.body.classList.toggle('sidebar-collapsed')); $('accountToggle').addEventListener('click',()=>document.body.classList.toggle('account-open')); $('reportToggle').addEventListener('click',()=>document.body.classList.toggle('report-open')); $('dashboardMenu').addEventListener('click',()=>showPage('dashboardPage','dashboard')); $('profileMenu').addEventListener('click',()=>{document.body.classList.add('account-open');showPage('profilePage','profile')}); $('materialsMenu').addEventListener('click',()=>showPage('materialsPage','materials')); $('memberSearchMenu').addEventListener('click',()=>{document.body.classList.add('report-open');showPage('memberSearchPage','memberSearch')}); $('firstDepositMenu').addEventListener('click',()=>{document.body.classList.add('report-open');showPage('firstDepositPage','firstDeposit')}); $('playerPerformanceMenu').addEventListener('click',()=>{document.body.classList.add('report-open');showPage('playerPerformancePage','playerPerformance')}); $('commissionMenu').addEventListener('click',()=>{document.body.classList.add('report-open');showPage('commissionReportPage','commissionReport')}); document.querySelectorAll('.js-copy').forEach(btn=>btn.addEventListener('click',()=>copyText(btn.parentElement.querySelector('.u').textContent.trim()))); if(sessionStorage.getItem('childUsername')){document.body.className='app-dash'; renderAll();} window.addEventListener('storage',e=>{if(e.key===KEY && document.body.classList.contains('app-dash')) renderAll();}); try{new BroadcastChannel('hauDaiSync').onmessage=()=>{if(document.body.classList.contains('app-dash')) renderAll();};}catch(e){} setInterval(()=>{if(document.body.classList.contains('app-dash')) renderAll();},1500);}
+      }); window.login=login; $('loginBtn').addEventListener('click',login); $('logoutBtn').addEventListener('click',logout); $('forgotLink').addEventListener('click',e=>{e.preventDefault();toast('Vui lòng liên hệ quản trị viên')}); $('hambBtn').addEventListener('click',()=>document.body.classList.toggle('sidebar-collapsed')); $('accountToggle').addEventListener('click',()=>document.body.classList.toggle('account-open')); $('reportToggle').addEventListener('click',()=>document.body.classList.toggle('report-open')); $('dashboardMenu').addEventListener('click',()=>showPage('dashboardPage','dashboard')); $('profileMenu').addEventListener('click',()=>{document.body.classList.add('account-open');showPage('profilePage','profile')}); $('loginHistoryMenu').addEventListener('click',()=>{document.body.classList.add('account-open');renderLoginHistoryPage();showPage('loginHistoryPage','loginHistory')}); $('materialsMenu').addEventListener('click',()=>showPage('materialsPage','materials')); $('memberSearchMenu').addEventListener('click',()=>{document.body.classList.add('report-open');showPage('memberSearchPage','memberSearch')}); $('firstDepositMenu').addEventListener('click',()=>{document.body.classList.add('report-open');showPage('firstDepositPage','firstDeposit')}); $('playerPerformanceMenu').addEventListener('click',()=>{document.body.classList.add('report-open');showPage('playerPerformancePage','playerPerformance')}); $('commissionMenu').addEventListener('click',()=>{document.body.classList.add('report-open');showPage('commissionReportPage','commissionReport')}); document.querySelectorAll('.js-copy').forEach(btn=>btn.addEventListener('click',()=>copyText(btn.parentElement.querySelector('.u').textContent.trim()))); if(sessionStorage.getItem('childUsername')){document.body.className='app-dash'; renderAll();} ['click','keydown','mousemove','touchstart'].forEach(ev=>window.addEventListener(ev,resetAutoLogout)); window.addEventListener('storage',e=>{if(e.key===KEY && document.body.classList.contains('app-dash')) renderAll();}); try{new BroadcastChannel('hauDaiSync').onmessage=()=>{if(document.body.classList.contains('app-dash')) renderAll();};}catch(e){} setInterval(()=>{if(document.body.classList.contains('app-dash')) renderAll();},1500);}
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
 </script>
