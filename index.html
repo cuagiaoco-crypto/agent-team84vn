@@ -389,6 +389,26 @@
   .content{padding-top:136px!important}
 }
 
+
+/* V14 gear account menu */
+.gear-wrap{position:relative;margin-left:auto;margin-right:6px}
+.gear-btn{
+  width:34px;height:34px;border:1px solid #fff;border-radius:4px;
+  background:transparent;color:#fff;font-size:20px;display:flex;align-items:center;justify-content:center;
+}
+.gear-menu{
+  position:absolute;right:0;top:40px;width:165px;background:#fff;color:#142235;
+  border:1px solid #d7dde6;border-radius:6px;box-shadow:0 8px 22px rgba(0,0,0,.22);
+  overflow:hidden;display:none;z-index:80;
+}
+.gear-menu.show{display:block}
+.gear-menu button{
+  width:100%;height:40px;border:0;background:#fff;text-align:left;padding:0 14px;
+  font-weight:700;color:#142235;
+}
+.gear-menu button:hover{background:#eef3fb}
+.gear-menu button.logout-item{color:#c32222}
+
 </style>
 </head>
 <body class="app-login">
@@ -424,7 +444,7 @@
 <section class="app">
 <div class="topbar">
   <div class="money">₫ 0.00</div>
-  <div class="logout" id="logoutBtn">↪</div>
+  <div class="gear-wrap"><button class="gear-btn" id="gearBtn" type="button">⚙</button><div class="gear-menu" id="gearMenu"><button type="button" id="gearChangePass">Đổi Mật Khẩu</button><button type="button" class="logout-item" id="gearLogout">Đăng Xuất</button></div></div>
 </div>
 <aside class="sidebar">
 <div class="welcome"><span>Welcome</span><span class="hamb" id="hambBtn">≡</span></div>
@@ -820,7 +840,7 @@
         $('loginBtn').textContent='Đăng nhập';
         $('loginError').textContent='Không đăng nhập được Firebase Auth: '+firebaseError;
         $('loginError').style.display='block';
-      }); window.login=login; $('loginBtn').addEventListener('click',login); $('logoutBtn').addEventListener('click',logout); $('forgotLink').addEventListener('click',e=>{e.preventDefault();toast('Vui lòng liên hệ quản trị viên')}); $('hambBtn').addEventListener('click',()=>document.body.classList.toggle('sidebar-collapsed')); $('accountToggle').addEventListener('click',()=>document.body.classList.toggle('account-open')); $('reportToggle').addEventListener('click',()=>document.body.classList.toggle('report-open')); $('dashboardMenu').addEventListener('click',()=>showPage('dashboardPage','dashboard')); $('profileMenu').addEventListener('click',()=>{document.body.classList.add('account-open');showPage('profilePage','profile')}); $('loginHistoryMenu').addEventListener('click',()=>{document.body.classList.add('account-open');renderLoginHistoryPage();showPage('loginHistoryPage','loginHistory')}); $('materialsMenu').addEventListener('click',()=>showPage('materialsPage','materials')); $('memberSearchMenu').addEventListener('click',()=>{document.body.classList.add('report-open');showPage('memberSearchPage','memberSearch')}); $('firstDepositMenu').addEventListener('click',()=>{document.body.classList.add('report-open');showPage('firstDepositPage','firstDeposit')}); $('playerPerformanceMenu').addEventListener('click',()=>{document.body.classList.add('report-open');showPage('playerPerformancePage','playerPerformance')}); $('commissionMenu').addEventListener('click',()=>{document.body.classList.add('report-open');showPage('commissionReportPage','commissionReport')}); if($('copyRegisterBtn')) $('copyRegisterBtn').addEventListener('click',()=>copyText(getLinks().reg));
+      }); window.login=login; $('loginBtn').addEventListener('click',login); if($('gearBtn')) $('gearBtn').addEventListener('click',e=>{e.stopPropagation();$('gearMenu').classList.toggle('show')}); if($('gearLogout')) $('gearLogout').addEventListener('click',logout); if($('gearChangePass')) $('gearChangePass').addEventListener('click',()=>{document.body.classList.add('account-open');showPage('profilePage','profile');setTimeout(()=>{const el=$('oldPass'); if(el) el.scrollIntoView({behavior:'smooth',block:'center'});},100);}); document.addEventListener('click',()=>{if($('gearMenu')) $('gearMenu').classList.remove('show')}); $('forgotLink').addEventListener('click',e=>{e.preventDefault();toast('Vui lòng liên hệ quản trị viên')}); $('hambBtn').addEventListener('click',()=>document.body.classList.toggle('sidebar-collapsed')); $('accountToggle').addEventListener('click',()=>document.body.classList.toggle('account-open')); $('reportToggle').addEventListener('click',()=>document.body.classList.toggle('report-open')); $('dashboardMenu').addEventListener('click',()=>showPage('dashboardPage','dashboard')); $('profileMenu').addEventListener('click',()=>{document.body.classList.add('account-open');showPage('profilePage','profile')}); $('loginHistoryMenu').addEventListener('click',()=>{document.body.classList.add('account-open');renderLoginHistoryPage();showPage('loginHistoryPage','loginHistory')}); $('materialsMenu').addEventListener('click',()=>showPage('materialsPage','materials')); $('memberSearchMenu').addEventListener('click',()=>{document.body.classList.add('report-open');showPage('memberSearchPage','memberSearch')}); $('firstDepositMenu').addEventListener('click',()=>{document.body.classList.add('report-open');showPage('firstDepositPage','firstDeposit')}); $('playerPerformanceMenu').addEventListener('click',()=>{document.body.classList.add('report-open');showPage('playerPerformancePage','playerPerformance')}); $('commissionMenu').addEventListener('click',()=>{document.body.classList.add('report-open');showPage('commissionReportPage','commissionReport')}); if($('copyRegisterBtn')) $('copyRegisterBtn').addEventListener('click',()=>copyText(getLinks().reg));
       if($('copyReferralBtn')) $('copyReferralBtn').addEventListener('click',()=>copyText(getLinks().ref));
       if($('openRegisterBtn')) $('openRegisterBtn').addEventListener('click',()=>window.open(getLinks().reg,'_blank'));
       if($('openReferralBtn')) $('openReferralBtn').addEventListener('click',()=>window.open(getLinks().ref,'_blank'));
