@@ -83,15 +83,14 @@
   const FIREBASE_READER_EMAIL = 'agentreader@gmail.com';
   const FIREBASE_READER_PASSWORD = '735198aa';
 
-  // Đọc tài khoản do hậu đài tổng tạo tại node /accounts
-  const dbRef = firebase.database().ref('accounts');
+  // Đọc đúng nơi hậu đài tổng đang lưu: /hauDaiData/accounts
+  const dbRef = firebase.database().ref('hauDaiData');
   function fmt(n){let v=String(n||0).replace(/VND/gi,'').trim(); if(v.includes('.')&&!v.includes(',')) v=v.replace(/\./g,''); v=v.replace(/,/g,''); return Number(v||0).toLocaleString('vi-VN',{minimumFractionDigits:2,maximumFractionDigits:2})+' VND';}
   function toast(msg){const el=$('toast'); el.textContent=msg; el.classList.add('show'); clearTimeout(toastTimer); toastTimer=setTimeout(()=>el.classList.remove('show'),2200);}
   function normalizeDb(data){
     data = data || {};
 
-    // Nếu đang đọc trực tiếp node /accounts:
-    // /accounts/pyno111/password => chuyển thành db.accounts[]
+    // Đọc node /hauDaiData có dạng: /hauDaiData/accounts
     if(!data.accounts){
       const accountsObj = data || {};
       data = {
@@ -171,7 +170,7 @@
     }
     if(firebaseError){$('loginError').textContent='Không đọc được Firebase: '+firebaseError; $('loginError').style.display='block'; return false;}
     const a=db.accounts.find(x=>String(x.username||'').trim()===u && String(x.password||'').trim()===p);
-    if(!a){$('loginError').textContent='Sai tài khoản hoặc mật khẩu hoặc tài khoản chưa có trong Firebase /accounts'; $('loginError').style.display='block'; return false;}
+    if(!a){$('loginError').textContent='Sai tài khoản hoặc mật khẩu hoặc tài khoản chưa có trong Firebase /hauDaiData/accounts'; $('loginError').style.display='block'; return false;}
     if(['Tạm khóa','locked','inactive','disabled','blocked'].includes(String(a.status||'').trim())){$('loginError').textContent='Tài khoản này đang bị khóa.'; $('loginError').style.display='block'; return false;}
     sessionStorage.setItem('childAccountId',a.id); sessionStorage.setItem('childUsername',a.username); current=ensure(a); $('loginError').style.display='none'; document.body.className='app-dash'; renderAll(); toast('Đăng nhập thành công'); return true;
   }
