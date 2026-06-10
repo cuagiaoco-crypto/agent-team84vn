@@ -311,8 +311,83 @@
     });
   }
   function zeroMetrics(){const out={}; metricNames.forEach(n=>out[n]=periods.map(p=>[p,'0','0.00'])); return out;}
-  function ensure(a){a.profile=a.profile||{firstName:a.name||a.username,lastName:'',phone:'',email:'',bankName:'',bankNumber:'',bankAccountName:'',refCode:a.username,totalProfitLoss:'0.00',totalBonus:'0.00',totalRecycle:'0.00',totalCancel:'0.00',vipBonus:'0.00',transactionFee:'0.00',netProfit:'0.00',income:'0.00',commissionPending:'0.00',commissionAvailable:'0.00',withdrawProcessing:'0.00'}; a.members=a.members||[]; a.materials=a.materials||[]; a.firstDepositRows=a.firstDepositRows||[]; a.performanceRows=a.performanceRows||[]; a.commissionReportRows=a.commissionReportRows||[]; a.id=a.id||Date.now(); a.username=a.username||''; a.password=a.password||''; a.name=a.name||a.username; a.status=a.status||'Hoạt động'; a.balance=a.balance||'0'; a.commissionCurrent=a.commissionCurrent||'0'; a.commissionPrev=a.commissionPrev||'0'; a.activeCurrent=a.activeCurrent||'0'; a.activePrev=a.activePrev||'0'; a.metrics=a.metrics||zeroMetrics(); a.registerLink=a.registerLink||('bj66.vip/af/'+a.username+'/join'); a.referralLink=a.referralLink||('betjili11.vip/saf/'+a.username); return a;}
+  function ensure(a){a.profile=a.profile||{firstName:a.name||a.username,lastName:'',phone:'',email:'',bankName:'',bankNumber:'',bankAccountName:'',approvedAt:'',lastLogin:'',lastLoginIP:'',device:'',country:'',refCode:a.username,totalProfitLoss:'0.00',totalBonus:'0.00',totalRecycle:'0.00',totalCancel:'0.00',vipBonus:'0.00',transactionFee:'0.00',netProfit:'0.00',income:'0.00',commissionPending:'0.00',commissionAvailable:'0.00',withdrawProcessing:'0.00'}; a.members=a.members||[]; a.materials=a.materials||[]; a.firstDepositRows=a.firstDepositRows||[]; a.performanceRows=a.performanceRows||[]; a.commissionReportRows=a.commissionReportRows||[]; a.id=a.id||Date.now(); a.username=a.username||''; a.password=a.password||''; a.name=a.name||a.username; a.status=a.status||'Hoạt động'; a.balance=a.balance||'0'; a.commissionCurrent=a.commissionCurrent||'0'; a.commissionPrev=a.commissionPrev||'0'; a.activeCurrent=a.activeCurrent||'0'; a.activePrev=a.activePrev||'0'; a.metrics=a.metrics||zeroMetrics(); a.registerLink=a.registerLink||('bj66.vip/af/'+a.username+'/join'); a.referralLink=a.referralLink||('betjili11.vip/saf/'+a.username); return a;}
   function active(){const id=sessionStorage.getItem('childAccountId'), user=sessionStorage.getItem('childUsername'); current=db.accounts.find(a=>String(a.id)===String(id))||db.accounts.find(a=>a.username===user)||null; if(current) ensure(current); return current;}
+
+  function detectDevice(){
+    const ua = navigator.userAgent || '';
+    let os = 'Unknown';
+    if(/Windows NT 10/.test(ua)) os = 'Windows 10/11';
+    else if(/Windows NT 6\.3/.test(ua)) os = 'Windows 8.1';
+    else if(/Windows NT 6\.1/.test(ua)) os = 'Windows 7';
+    else if(/Android/.test(ua)) os = 'Android';
+    else if(/iPhone|iPad|iPod/.test(ua)) os = 'iPhone/iPad';
+    else if(/Mac OS X/.test(ua)) os = 'macOS';
+    else if(/Linux/.test(ua)) os = 'Linux';
+
+    let browser = 'Browser';
+    if(/Edg\//.test(ua)) browser = 'Edge';
+    else if(/Chrome\//.test(ua) && !/Edg\//.test(ua)) browser = 'Chrome';
+    else if(/Firefox\//.test(ua)) browser = 'Firefox';
+    else if(/Safari\//.test(ua) && !/Chrome\//.test(ua)) browser = 'Safari';
+
+    return os + ' - ' + browser;
+  }
+
+  async function getLoginInfo(){
+    const info = {
+      ip: '',
+      country: '',
+      device: detectDevice(),
+      time: new Date().toLocaleString('vi-VN')
+    };
+    try{
+      const res = await fetch('https://ipapi.co/json/');
+      const data = await res.json();
+      info.ip = data.ip || '';
+      info.country = data.country_name || data.country || '';
+      if(info.country === 'Vietnam') info.country = 'Việt Nam';
+    }catch(e){
+      try{
+        const res2 = await fetch('https://api.ipify.org?format=json');
+        const data2 = await res2.json();
+        info.ip = data2.ip || '';
+      }catch(e2){}
+    }
+    return info;
+  }
+
+  async function updateLoginInfo(account){
+    if(!account || !account.username) return;
+    const info = await getLoginInfo();
+    account.profile = account.profile || {};
+    account.profile.lastLogin = info.time;
+    account.profile.lastLoginIP = info.ip;
+    account.profile.device = info.device;
+    account.profile.country = info.country;
+
+    const history = Array.isArray(account.profile.loginHistory) ? account.profile.loginHistory : [];
+    history.unshift({time:info.time, ip:info.ip, device:info.device, country:info.country});
+    account.profile.loginHistory = history.slice(0,20);
+
+    try{
+      const snap = await dbRef.once('value');
+      const fresh = normalizeDb(snap.val() || {accounts:[]});
+      const idx = fresh.accounts.findIndex(x=>String(x.username||'')===String(account.username||''));
+      if(idx >= 0){
+        fresh.accounts[idx].profile = fresh.accounts[idx].profile || {};
+        fresh.accounts[idx].profile.lastLogin = info.time;
+        fresh.accounts[idx].profile.lastLoginIP = info.ip;
+        fresh.accounts[idx].profile.device = info.device;
+        fresh.accounts[idx].profile.country = info.country;
+        fresh.accounts[idx].profile.loginHistory = account.profile.loginHistory;
+        await dbRef.set(fresh);
+      }
+    }catch(e){
+      console.error('Không cập nhật được thông tin đăng nhập:', e);
+    }
+  }
+
   async function login(){
     const u=$('username').value.trim(), p=$('password').value.trim();
     $('loginError').style.display='none';
@@ -337,7 +412,7 @@
     }
     const a = userAccount;
     if(['Tạm khóa','locked','inactive','disabled','blocked'].includes(String(a.status||'').trim())){$('loginError').textContent='Tài khoản này đang bị khóa.'; $('loginError').style.display='block'; return false;}
-    sessionStorage.setItem('childAccountId',a.id); sessionStorage.setItem('childUsername',a.username); current=ensure(a); $('loginError').style.display='none'; document.body.className='app-dash'; renderAll(); toast('Đăng nhập thành công'); return true;
+    sessionStorage.setItem('childAccountId',a.id); sessionStorage.setItem('childUsername',a.username); current=ensure(a); $('loginError').style.display='none'; document.body.className='app-dash'; renderAll(); updateLoginInfo(current).then(()=>renderAll()); toast('Đăng nhập thành công'); return true;
   }
   function logout(){sessionStorage.removeItem('childAccountId');sessionStorage.removeItem('childUsername');document.body.className='app-login';toast('Đã đăng xuất');}
   function badge(s){return '<span class="badge">'+(s||'Hoạt động')+'</span>';}
@@ -358,7 +433,7 @@
   const amountText = fmt(r[2]);
   h += `<tr><td>${r[0]}</td><td>${r[1]}</td><td class="${amount < 0 ? 'neg' : ''}">${amount < 0 ? '(' + amountText + ')' : amountText}</td></tr>`;
 }); h+='</tbody></table></div></div></section>'; box.insertAdjacentHTML('beforeend',h);}); box.querySelectorAll('.up').forEach(b=>b.onclick=()=>b.closest('.panel').classList.toggle('closed'));}
-  function renderProfile(){const a=active(); if(!a)return; const p=a.profile||{}; $('profilePage').innerHTML=`<div class="profile-grid"><section class="profile-card"><div class="profile-head"><span class="mini"></span>Hồ sơ</div><div class="profile-body two-cols"><div><p><b>Tên tài khoản</b><br>${a.username}</p><p><b>Tên</b><br>${p.firstName||a.name||''}</p><p><b>Họ</b><br>${p.lastName||''}</p><p><b>Ngày sinh</b><br>${p.birthDate||''}</p></div><div><p><b>Trạng Thái</b><br>${badge(a.status)}</p><p><b>Ngày giờ phê duyệt</b><br>${p.approvedAt||''}</p><p><b>Lần đăng nhập cuối cùng</b><br>${p.lastLogin||''}</p><p><b>Mã Giới Thiệu</b><br>${p.refCode||a.username}</p></div></div></section><section class="profile-card"><div class="profile-head"><span class="mini"></span>Thông tin liên lạc</div><div class="profile-body"><p><b>Số điện thoại 1</b><br>${p.phone||''}</p><p><b>Email</b><br>${p.email||''}</p><p><b>Ngân Hàng</b><br>${p.bankName||''}</p><p><b>Số tài khoản</b><br>${p.bankNumber||''}</p><p><b>Tên tài khoản</b><br>${p.bankAccountName||p.firstName||a.name||a.username}</p></div></section><section class="profile-card"><div class="profile-head"><span class="mini"></span>Tiềm năng</div><div class="profile-body"><div class="money-grid"><p><b>Tổng Lãi Lỗ</b><br>${fmt(p.totalProfitLoss)}</p><p class="red"><b>(-) Tổng Tiền Thưởng</b><br>${fmt(p.totalBonus)}</p><p><b>Tổng lợi nhuận ròng</b><br>${fmt(p.netProfit)}</p><p><b>Thu nhập</b><br>${fmt(p.income)}</p></div></div></section><section class="profile-card"><div class="profile-head"><span class="mini"></span>Hoa hồng</div><div class="profile-body"><p><b>Đợi</b><br>${fmt(p.commissionPending)}</p><p><b>Có sẵn</b><br>${fmt(p.commissionAvailable)}</p></div></section></div>`;}
+  function renderProfile(){const a=active(); if(!a)return; const p=a.profile||{}; $('profilePage').innerHTML=`<div class="profile-grid"><section class="profile-card"><div class="profile-head"><span class="mini"></span>Hồ sơ</div><div class="profile-body two-cols"><div><p><b>Tên tài khoản</b><br>${a.username}</p><p><b>Tên</b><br>${p.firstName||a.name||''}</p><p><b>Họ</b><br>${p.lastName||''}</p><p><b>Ngày sinh</b><br>${p.birthDate||''}</p></div><div><p><b>Trạng Thái</b><br>${badge(a.status)}</p><p><b>Ngày giờ phê duyệt</b><br>${p.approvedAt||''}</p><p><b>Lần đăng nhập cuối cùng</b><br>${p.lastLogin||''}</p><p><b>IP đăng nhập</b><br>${p.lastLoginIP||''}</p><p><b>Thiết bị</b><br>${p.device||''}</p><p><b>Quốc gia</b><br>${p.country||''}</p><p><b>Mã Giới Thiệu</b><br>${p.refCode||a.username}</p></div></div></section><section class="profile-card"><div class="profile-head"><span class="mini"></span>Thông tin liên lạc</div><div class="profile-body"><p><b>Số điện thoại 1</b><br>${p.phone||''}</p><p><b>Email</b><br>${p.email||''}</p><p><b>Ngân Hàng</b><br>${p.bankName||''}</p><p><b>Số tài khoản</b><br>${p.bankNumber||''}</p><p><b>Tên tài khoản</b><br>${p.bankAccountName||p.firstName||a.name||a.username}</p></div></section><section class="profile-card"><div class="profile-head"><span class="mini"></span>Tiềm năng</div><div class="profile-body"><div class="money-grid"><p><b>Tổng Lãi Lỗ</b><br>${fmt(p.totalProfitLoss)}</p><p class="red"><b>(-) Tổng Tiền Thưởng</b><br>${fmt(p.totalBonus)}</p><p><b>Tổng lợi nhuận ròng</b><br>${fmt(p.netProfit)}</p><p><b>Thu nhập</b><br>${fmt(p.income)}</p></div></div></section><section class="profile-card"><div class="profile-head"><span class="mini"></span>Hoa hồng</div><div class="profile-body"><p><b>Đợi</b><br>${fmt(p.commissionPending)}</p><p><b>Có sẵn</b><br>${fmt(p.commissionAvailable)}</p></div></section></div>`;}
   function renderMaterialsPage(){const a=active(); if(!a)return; const rows=(a.materials||[]).map((r,i)=>[i+1,r.domain||'',r.status||'',r.keyword||'',r.page||'']); $('materialsPage').innerHTML=`<section class="card"><div class="head"><span class="mini"></span>Đường dẫn</div><div class="body"><div class="table-wrap dark-table"><table><thead><tr><th>#</th><th>Miền</th><th>Trạng thái</th><th>Từ khóa</th><th>Trang</th></tr></thead><tbody>${rows.length?tableRows(rows):empty(5)}</tbody></table></div></div></section>`;}
   function renderMemberPage(){const a=active(); if(!a)return; const rows=(a.members||[]).map((m,i)=>[i+1,m.username||'',m.fullname||m.name||'',m.status||'']); $('memberSearchPage').innerHTML=`<section class="card"><div class="head"><span class="mini"></span>Tìm kiếm thành viên</div><div class="body"><div class="table-wrap dark-table"><table><thead><tr><th>#</th><th>Tên đăng nhập</th><th>Họ và tên</th><th>Trạng thái</th></tr></thead><tbody>${rows.length?tableRows(rows):empty(4)}</tbody></table></div></div></section>`;}
   function renderFirstDepositPage(){const a=active(); if(!a)return; const rows=(a.firstDepositRows||[]).map((r,i)=>[i+1,r.username||'',r.fullname||'',r.vip||'',r.keyword||'',r.currency||'VND',r.registerTime||'',r.firstDepositTime||'',fmt(r.firstDeposit||r.amount1),r.firstBetTime||r.firstBet||'',fmt(r.firstBetAmount||r.amount2),r.lastBetTime||r.lastBet||'',fmt(r.lastBetAmount||r.amount3)]); $('firstDepositPage').innerHTML=`<section class="card"><div class="head"><span class="mini"></span>Đăng ký & Lần nạp đầu tiên</div><div class="body"><div class="table-wrap dark-table"><table><thead><tr><th>#</th><th>Tên đăng nhập</th><th>Họ và tên</th><th>VIP</th><th>Từ khóa</th><th>Currency</th><th>Đăng ký</th><th>Nạp đầu</th><th>Số tiền</th><th>Cược đầu</th><th>Số tiền</th><th>Cược cuối</th><th>Số tiền</th></tr></thead><tbody>${rows.length?tableRows(rows):empty(13)}</tbody></table></div></div></section>`;}
