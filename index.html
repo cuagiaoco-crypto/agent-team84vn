@@ -16,20 +16,167 @@
     .profile-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}.two-cols{display:grid;grid-template-columns:1fr 1fr;gap:70px}.profile-body p{line-height:1.45;margin:0 0 20px}.badge{background:#31aa42;color:#fff;border-radius:12px;padding:2px 9px;font-size:12px;font-weight:700}.pill{display:inline-block;border:1px solid #e21e2b;color:#e21e2b;border-radius:12px;padding:2px 8px;font-size:12px;margin:3px 2px}.tabs{display:flex;gap:8px;flex-wrap:wrap}.tab{padding:9px 16px;cursor:pointer}.tab.active{background:var(--dark);color:#fff}.blue-line{height:4px;background:#2d3b52;margin-bottom:18px}.money-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px 34px}.profit-row{border-top:1px solid #777;padding-top:12px}.profit-row.two{display:grid;grid-template-columns:1fr 1fr}.actions{border-top:1px solid #ddd;padding:13px 0;display:flex;justify-content:flex-end;gap:8px}.actions button{height:33px;padding:0 16px;border:0;border-radius:3px;background:var(--dark);color:#fff;font-weight:700}
     .toolbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;gap:12px}.column-btn{height:32px;border:1px solid #2d3b52;border-radius:3px;background:#fff;color:#2d3b52;padding:0 12px;font-weight:700}.search-box{display:flex;align-items:center;gap:6px}.search-box input{height:28px;width:137px;border:1px solid #c6cbd1;border-radius:3px;padding:4px 8px}.table-footer{display:flex;align-items:center;justify-content:space-between;padding:20px 0}.pagination{display:flex;gap:8px}.page-btn{min-width:28px;height:30px;border:1px solid #c9ced6;border-radius:4px;background:#fff;color:#2d3b52;font-weight:700}.page-btn.active{background:#2d3b52;color:#fff}.page-btn.disabled{opacity:.4}.filter-btn{height:33px;background:var(--dark);color:#fff;border:0;border-radius:3px;padding:0 12px;font-size:15px;font-weight:700;margin-bottom:18px}.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:24px}.form-grid.three{grid-template-columns:1fr 1fr 1fr}.empty{text-align:center!important;background:#f4f4f4}.edit-btn{width:20px;height:20px;border:0;border-radius:3px;background:var(--dark);color:#fff}.toast{position:fixed;right:18px;bottom:18px;z-index:50;background:#26364d;color:#fff;padding:11px 15px;border-radius:4px;box-shadow:0 4px 12px rgba(0,0,0,.25);opacity:0;transform:translateY(12px);transition:.25s;pointer-events:none}.toast.show{opacity:1;transform:translateY(0)}
     @media(max-width:760px){.topbar{display:grid;grid-template-columns:1fr auto;height:auto}.top-section.left,.top-section.mid{grid-column:1/3;width:100%;justify-content:flex-start}.top-label{display:none}.urlbox{width:100%}.sidebar{top:122px;width:58px}.content{margin-left:58px;padding:136px 8px 14px}.menu-text,.chev,.welcome span:first-child{display:none}.menu-item{justify-content:center;padding:0}.summary,.grid,.profile-grid,.two-cols,.money-grid,.form-grid,.form-grid.three{grid-template-columns:1fr}.toolbar{align-items:flex-start;flex-direction:column}.search-box{width:100%;justify-content:space-between}.search-box input{flex:1}}
-  </style>
+  
+/* MB66 login style */
+.login-page{
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:24px;
+  background:linear-gradient(135deg,#5d5af7 0%,#805fff 48%,#b35cf5 100%)!important;
+}
+.mb-login-card{
+  width:min(1250px,92vw);
+  min-height:610px;
+  display:grid;
+  grid-template-columns:1.35fr .9fr;
+  background:#fff;
+  box-shadow:0 24px 55px rgba(30,24,97,.32);
+  overflow:hidden;
+}
+.mb-login-left{
+  position:relative;
+  overflow:hidden;
+  padding:62px 54px;
+  color:#fff;
+  background:
+    radial-gradient(circle at 76% 18%,rgba(255,117,133,.82) 0 90px,transparent 92px),
+    linear-gradient(135deg,#5e61ff 0%,#8061f2 44%,#ff5f9c 100%);
+}
+.mb-brand{position:relative;z-index:2}
+.mb-brand h1{font-size:52px;line-height:1;margin:0 0 18px;font-weight:800;letter-spacing:.5px;color:#fff}
+.mb-brand p{font-size:25px;line-height:1.45;margin:0;color:#fff}
+.mb-shape,.mb-line{position:absolute;display:block;border-radius:50px;transform:rotate(-45deg);opacity:.95}
+.mb-shape.s1{width:180px;height:72px;left:-35px;bottom:70px;background:linear-gradient(90deg,#ff5f9c,#ac63f2)}
+.mb-shape.s2{width:220px;height:78px;left:210px;bottom:-8px;background:linear-gradient(90deg,#ffb75f,#f45aa8,#8360ee)}
+.mb-shape.s3{width:235px;height:78px;right:95px;bottom:18px;background:linear-gradient(90deg,#7e61ee,#ff6c9b,#ffb35b)}
+.mb-line{height:8px;background:linear-gradient(90deg,#ffb85f,#ff6aa8);z-index:1}
+.mb-line.l1{width:185px;left:165px;bottom:75px}
+.mb-line.l2{width:160px;left:300px;bottom:170px}
+.mb-line.l3{width:132px;right:78px;bottom:48px}
+.mb-line.l4{width:118px;left:42px;bottom:110px}
+.mb-login-right.login-card{
+  width:auto;
+  border-radius:0;
+  box-shadow:none;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  padding:0 52px;
+  background:#fff;
+}
+.mb-login-right .login-head{
+  height:auto;
+  border:0;
+  padding:0;
+  margin-bottom:26px;
+  display:block;
+  text-align:center;
+}
+.mb-login-right .login-head h1{
+  font-size:29px;
+  color:#7b5df7;
+  font-weight:500;
+  margin:0;
+}
+.mb-login-right .login-body{
+  width:100%;
+  max-width:330px;
+  padding:0;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+}
+.mb-field{
+  width:100%;
+  height:52px;
+  border-radius:28px;
+  background:#e8ddff;
+  margin-bottom:24px;
+  display:flex;
+  align-items:center;
+  padding:0 18px;
+}
+.mb-field input{
+  border:0!important;
+  background:transparent!important;
+  height:100%!important;
+  outline:none;
+  color:#7c5df4;
+  font-size:16px;
+  padding:0 8px!important;
+}
+.mb-field input::placeholder{color:#7c5df4;opacity:.9}
+.mb-ico,.mb-eye{color:#755bf2;font-size:16px;line-height:1}
+.mb-eye{margin-left:auto;opacity:.85}
+.mb-login-btn{
+  width:100%;
+  height:62px;
+  border-radius:30px;
+  font-size:24px;
+  font-weight:800;
+  background:linear-gradient(90deg,#695cff,#b85deb)!important;
+  box-shadow:none;
+  margin-bottom:20px;
+}
+.mb-lang{
+  align-self:flex-start;
+  width:auto!important;
+  height:42px!important;
+  border:1px solid #2c7cff!important;
+  border-radius:22px!important;
+  color:#2b73ff!important;
+  background:#fff!important;
+  padding:0 14px!important;
+  font-size:16px;
+}
+.mb-login-right .login-error{
+  width:100%;
+  margin-top:18px;
+  text-align:center;
+}
+.mb-login-right .login-foot{display:none}
+@media(max-width:900px){
+  .mb-login-card{grid-template-columns:1fr;min-height:auto}
+  .mb-login-left{min-height:240px;padding:34px}
+  .mb-brand h1{font-size:42px}
+  .mb-brand p{font-size:20px}
+  .mb-login-right.login-card{padding:42px 24px}
+}
+
+</style>
 </head>
 <body class="app-login">
 <section class="login-page">
-<main class="login-card">
-<header class="login-head"><span class="bar"></span><h1>Đăng nhập</h1></header>
-<section class="login-body">
-<div class="field"><label>Tên tài khoản</label><input autocomplete="username" id="username" type="text"/></div>
-<div class="field"><label>Mật khẩu</label><input autocomplete="current-password" id="password" type="password"/></div>
-<select id="language"><option>Tiếng Việt</option><option>English</option></select>
-<div class="login-error" id="loginError">Vui lòng nhập tên tài khoản và mật khẩu.</div>
-</section>
-<footer class="login-foot"><button class="btn" id="loginBtn" type="button">Đăng nhập</button><div class="login-links"><a class="forgot" href="#" id="forgotLink">Quên mật khẩu</a></div></footer>
-</main>
+  <div class="mb-login-card">
+    <div class="mb-login-left">
+      <div class="mb-brand">
+        <h1>MB66</h1>
+        <p>Hệ thống quản lý đầu cuối dành cho Bên nhượng quyền</p>
+      </div>
+      <div class="mb-sun"></div>
+      <span class="mb-shape s1"></span>
+      <span class="mb-shape s2"></span>
+      <span class="mb-shape s3"></span>
+      <span class="mb-line l1"></span>
+      <span class="mb-line l2"></span>
+      <span class="mb-line l3"></span>
+      <span class="mb-line l4"></span>
+    </div>
+    <main class="login-card mb-login-right">
+      <header class="login-head"><h1>Đăng Nhập</h1></header>
+      <section class="login-body">
+        <div class="field mb-field"><span class="mb-ico">👤</span><input autocomplete="username" id="username" type="text" placeholder="Xin Vui Lòng Nhập Tài Khoản"/></div>
+        <div class="field mb-field"><span class="mb-ico">🔒</span><input autocomplete="current-password" id="password" type="password" placeholder="Xin Vui Lòng Nhập Mật Khẩu"/><span class="mb-eye">◕</span></div>
+        <button class="btn mb-login-btn" id="loginBtn" type="button">Đăng Nhập</button>
+        <select id="language" class="mb-lang"><option>🇻🇳 Việt Nam</option><option>English</option></select>
+        <div class="login-error" id="loginError">Vui lòng nhập tên tài khoản và mật khẩu.</div>
+      </section>
+      <footer class="login-foot"><div class="login-links"><a class="forgot" href="#" id="forgotLink">Quên mật khẩu</a></div></footer>
+    </main>
+  </div>
 </section>
 <section class="app">
 <div class="topbar">
