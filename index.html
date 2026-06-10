@@ -409,6 +409,26 @@
 .gear-menu button:hover{background:#eef3fb}
 .gear-menu button.logout-item{color:#c32222}
 
+
+/* Fix change password */
+.change-pass-box input{
+  width:100%;
+  height:34px;
+  border:1px solid #c8cdd3;
+  border-radius:3px;
+  padding:5px 9px;
+  margin:5px 0 12px;
+}
+.change-pass-box button{
+  height:34px;
+  padding:0 16px;
+  border:0;
+  border-radius:3px;
+  background:#1d5fd1;
+  color:#fff;
+  font-weight:700;
+}
+
 </style>
 </head>
 <body class="app-login">
@@ -680,25 +700,72 @@
   }
 
   async function changePassword(){
-    const a=active(); if(!a) return;
-    const oldP=$('oldPass')?.value.trim()||'', newP=$('newPass')?.value.trim()||'', newP2=$('newPass2')?.value.trim()||'';
-    if(!oldP||!newP||!newP2){toast('Vui lòng nhập đủ thông tin');return;}
-    if(String(a.password||'').trim()!==oldP){toast('Mật khẩu cũ không đúng');return;}
-    if(newP.length<8){toast('Mật khẩu mới tối thiểu 8 ký tự');return;}
-    if(newP!==newP2){toast('Nhập lại mật khẩu không khớp');return;}
+    const a = active();
+    if(!a){
+      toast('Vui lòng đăng nhập lại');
+      return;
+    }
+
+    const oldEl = document.getElementById('oldPass');
+    const newEl = document.getElementById('newPass');
+    const new2El = document.getElementById('newPass2');
+
+    const oldP = (oldEl?.value || '').trim();
+    const newP = (newEl?.value || '').trim();
+    const newP2 = (new2El?.value || '').trim();
+
+    if(!oldP || !newP || !newP2){
+      toast('Vui lòng nhập đầy đủ mật khẩu');
+      return;
+    }
+
+    if(String(a.password || '').trim() !== oldP){
+      toast('Mật khẩu cũ không đúng');
+      return;
+    }
+
+    if(newP.length < 6){
+      toast('Mật khẩu mới tối thiểu 6 ký tự');
+      return;
+    }
+
+    if(newP !== newP2){
+      toast('Nhập lại mật khẩu mới không khớp');
+      return;
+    }
+
     try{
-      const snap=await dbRef.once('value');
-      const raw=snap.val()||{};
-      let accounts=Array.isArray(raw.accounts)?raw.accounts:Object.values(raw.accounts||{});
-      let idx=accounts.findIndex(x=>String(x.username||'')===String(a.username||''));
-      if(idx>=0){
-        await firebase.database().ref('hauDaiData/accounts/'+idx+'/password').set(newP);
-        a.password=newP; current=a;
-        $('oldPass').value='';$('newPass').value='';$('newPass2').value='';
-        toast('Đã đổi mật khẩu');
+      const snap = await dbRef.once('value');
+      const raw = snap.val() || {};
+      let accounts = Array.isArray(raw.accounts) ? raw.accounts : Object.values(raw.accounts || {});
+      let idx = accounts.findIndex(x => String(x.username || '') === String(a.username || ''));
+
+      if(idx < 0){
+        idx = accounts.findIndex(x => String(x.id || '') === String(a.id || ''));
       }
-    }catch(e){console.error(e);toast('Không đổi được mật khẩu');}
+
+      if(idx < 0){
+        toast('Không tìm thấy tài khoản trên Firebase');
+        return;
+      }
+
+      await firebase.database().ref('hauDaiData/accounts/' + idx + '/password').set(newP);
+
+      // Cập nhật phiên hiện tại để không bị sai mật khẩu khi đổi lần tiếp theo
+      a.password = newP;
+      current = a;
+
+      if(oldEl) oldEl.value = '';
+      if(newEl) newEl.value = '';
+      if(new2El) new2El.value = '';
+
+      toast('Đổi mật khẩu thành công');
+    }catch(e){
+      console.error('Đổi mật khẩu lỗi:', e);
+      toast('Không đổi được mật khẩu. Kiểm tra quyền Firebase');
+    }
   }
+
 
   function renderLoginHistoryPage(){
     const a=active(); if(!a) return;
