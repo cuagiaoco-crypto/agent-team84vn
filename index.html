@@ -275,6 +275,120 @@
   .content{padding-top:136px!important}
 }
 
+
+/* V14 UI FIX: only registration link + QR, remove referral link card */
+.topbar{
+  height:46px!important;
+}
+.top-section.left,.top-section.mid{
+  display:none!important;
+}
+.topbar .logout{margin-left:auto}
+.content{
+  padding-top:74px!important;
+}
+.v14-link-qr-row{
+  display:grid!important;
+  grid-template-columns:minmax(420px,1fr) 280px!important;
+  gap:16px!important;
+  margin:0 0 16px!important;
+  align-items:stretch!important;
+}
+.v14-link-card,.v14-qr-card{
+  background:#fff;
+  border-radius:6px;
+  box-shadow:0 2px 6px rgba(0,0,0,.16);
+  border:1px solid #dfe4ea;
+  padding:16px;
+  min-height:176px;
+}
+.v14-link-card.register{
+  background:linear-gradient(135deg,#f7fbff,#eef5ff);
+}
+.v14-link-card.referral{
+  display:none!important;
+}
+.v14-link-title{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  font-size:16px;
+  font-weight:800;
+  color:#184b91;
+  margin-bottom:18px;
+}
+.v14-link-input{
+  width:100%;
+  min-height:42px;
+  border:1px solid #cfd7e3;
+  border-radius:4px;
+  background:#fff;
+  padding:11px 12px;
+  font-size:15px;
+  font-weight:700;
+  color:#18304f;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+.v14-link-actions{
+  display:flex;
+  gap:10px;
+  margin-top:16px;
+  flex-wrap:wrap;
+}
+.v14-btn{
+  height:38px;
+  border:0;
+  border-radius:4px;
+  padding:0 14px;
+  color:#fff;
+  font-weight:800;
+  background:#1d5fd1;
+}
+.v14-btn.green{background:#159447}
+.v14-btn.light{
+  background:#fff;
+  color:#18304f;
+  border:1px solid #cfd7e3;
+}
+.v14-qr-card{
+  text-align:center;
+  background:#fff;
+}
+.v14-qr-title{
+  font-size:15px;
+  font-weight:800;
+  margin-bottom:10px;
+  color:#142235;
+}
+.v14-qr-img{
+  width:128px;
+  height:128px;
+  object-fit:contain;
+  border:1px solid #d6dce5;
+  background:#fff;
+  display:block;
+  margin:0 auto 12px;
+}
+.v14-qr-actions{
+  display:flex;
+  justify-content:center;
+  gap:8px;
+}
+.v14-qr-actions .v14-btn{
+  height:34px;
+  font-size:12px;
+  padding:0 10px;
+}
+.qr-modal{display:none!important}
+@media(max-width:1050px){
+  .v14-link-qr-row{grid-template-columns:1fr!important}
+}
+@media(max-width:760px){
+  .content{padding-top:136px!important}
+}
+
 </style>
 </head>
 <body class="app-login">
@@ -333,19 +447,11 @@
     </div>
   </section>
   <section class="v14-qr-card">
-    <div class="v14-qr-title">MÃ QR GIỚI THIỆU</div>
+    <div class="v14-qr-title">MÃ QR ĐĂNG KÝ</div>
     <img class="v14-qr-img" id="v14QrImg" alt="QR">
     <div class="v14-qr-actions">
       <button class="v14-btn green" type="button" id="copyQrBtn">📋 Sao chép QR</button>
       <button class="v14-btn" type="button" id="downloadQrBtn">⬇ Tải QR</button>
-    </div>
-  </section>
-  <section class="v14-link-card referral">
-    <div class="v14-link-title">👥 LINK GIỚI THIỆU</div>
-    <div class="v14-link-input" id="v14ReferralLink">...</div>
-    <div class="v14-link-actions">
-      <button class="v14-btn green" type="button" id="copyReferralBtn">📋 Sao chép Link</button>
-      <button class="v14-btn light" type="button" id="openReferralBtn">↗ Mở link</button>
     </div>
   </section>
 </div>
@@ -631,31 +737,31 @@
     if(!a) return;
     const links=getLinks();
     if($('v14RegisterLink')) $('v14RegisterLink').textContent=links.reg;
-    if($('v14ReferralLink')) $('v14ReferralLink').textContent=links.ref;
-    if($('v14QrImg')) $('v14QrImg').src=qrUrl(links.ref,520);
+    
+    if($('v14QrImg')) $('v14QrImg').src=qrUrl(links.reg,520);
   }
   async function copyQrImage(){
     const links=getLinks();
     try{
-      const res=await fetch(qrUrl(links.ref,800));
+      const res=await fetch(qrUrl(links.reg,800));
       const blob=await res.blob();
       if(navigator.clipboard && window.ClipboardItem){
         await navigator.clipboard.write([new ClipboardItem({'image/png':blob})]);
         toast('Đã sao chép QR');
       }else{
-        await copyText(links.ref);
+        await copyText(links.reg);
         toast('Trình duyệt không hỗ trợ sao chép ảnh, đã sao chép link');
       }
     }catch(e){
       console.error(e);
-      await copyText(links.ref);
+      await copyText(links.reg);
       toast('Không sao chép được QR, đã sao chép link');
     }
   }
   async function downloadQrImage(){
     const a=active(), links=getLinks();
     try{
-      const res=await fetch(qrUrl(links.ref,1000));
+      const res=await fetch(qrUrl(links.reg,1000));
       const blob=await res.blob();
       const url=URL.createObjectURL(blob);
       const down=document.createElement('a');
@@ -667,7 +773,7 @@
       URL.revokeObjectURL(url);
       toast('Đã tải QR');
     }catch(e){
-      window.open(qrUrl(links.ref,1000),'_blank');
+      window.open(qrUrl(links.reg,1000),'_blank');
     }
   }
 
