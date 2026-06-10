@@ -1,297 +1,384 @@
 <!DOCTYPE html>
+
 <html lang="vi">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Hậu Đài Tổng Firebase V13</title>
-<link rel="icon" type="image/svg+xml" href='data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"%3E%3Crect width="64" height="64" rx="14" fill="%233f4a60"/%3E%3Ctext x="32" y="42" font-size="34" text-anchor="middle" fill="white"%3E⚙%3C/text%3E%3C/svg%3E'>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Agent Dashboard</title>
+<link rel="icon" type="image/svg+xml" href='data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"%3E%3Crect width="64" height="64" rx="12" fill="%232e7d32"/%3E%3Ctext x="32" y="42" font-size="30" text-anchor="middle" fill="white"%3E👤%3C/text%3E%3C/svg%3E'>
 <style>
-*{box-sizing:border-box;font-family:Arial,Helvetica,sans-serif}
-body{margin:0;background:#e9eef4;color:#001b39}
-.hidden{display:none!important}
-.login-page{height:100vh;background:#37465d;display:flex;align-items:center;justify-content:center}
-.login-box{width:420px;background:#fff;border-radius:4px;box-shadow:0 15px 35px #0004}
-.title,.mini-title{padding:16px 20px;border-bottom:1px solid #ddd;font-size:21px;font-weight:700}
-.title:before,.mini-title:before{content:"";display:inline-block;width:5px;height:24px;background:#314057;margin-right:12px;vertical-align:middle;border-radius:3px}
-.body{padding:20px}
-label{display:block;font-weight:700;margin:10px 0 6px}
-input,select{width:100%;height:34px;border:1px solid #bfc7d2;border-radius:3px;padding:6px 9px;margin-bottom:12px}
-button{background:#314057;color:#fff;border:0;border-radius:3px;padding:9px 15px;font-weight:700;cursor:pointer;margin:2px}
-button:hover{opacity:.9}
-.btn-green{background:#288044}.btn-orange{background:#c7831e}.btn-red{background:#b83232}.btn-blue{background:#2456a6}.btn-gray{background:#627187}
-.error{display:none;color:red;font-weight:700;text-align:center}.ok{color:green;font-weight:700}
-.app{display:none}
-.sidebar{position:fixed;left:0;top:0;bottom:0;width:235px;background:#748297;color:white}
-.logo{height:55px;background:#6b798e;display:flex;align-items:center;justify-content:space-between;padding:0 18px;font-weight:700}
-.menu{padding-top:12px}.menu div{padding:15px 22px;cursor:pointer;font-weight:700}.menu div:hover,.menu .active{background:#627187}.sub{background:#e9eef4!important;color:#001b39!important;padding-left:38px!important}
-.main{margin-left:235px;padding:18px;min-height:100vh}
-.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px}
-.box{background:#fff;border:1px solid #ddd;border-radius:4px;box-shadow:0 2px 8px #0001;margin-bottom:18px}
-table{width:100%;border-collapse:collapse;margin-top:10px}th,td{border:1px solid #d6d6d6;padding:10px;text-align:center;font-size:14px}th{background:#344158;color:white}tr:nth-child(even){background:#f1f1f1}
-.status-active{color:green;font-weight:700}.status-lock{color:red;font-weight:700}.manage-link{color:red;font-weight:700;text-decoration:none;cursor:pointer}
-.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:18px}.stat{background:#fff;border-left:5px solid #314057;padding:20px;font-weight:700;font-size:18px}.num{font-size:32px;color:#314057;margin-top:8px}
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-.kpi{height:125px;padding:25px 18px;background:#cfdee1;border-top:3px solid #6f7f8e;position:relative}.kpi.green{background:#d4ead7}.kpi h3{font-size:15px}
-.kpi .lab1{position:absolute;right:260px;top:48px;color:#526077;font-weight:700}.kpi .lab2{position:absolute;right:260px;top:83px;color:#526077;font-weight:700}
-.kpi input{position:absolute;right:18px;width:190px!important;height:34px!important;font-size:24px!important;text-align:right!important;background:transparent!important;border:1px dashed transparent!important;color:#435879!important}
-.kpi input:hover,.edit:hover,.edit:focus{border-color:red!important;background:white!important}
-.kpi .v1{top:42px}.kpi .v2{top:77px}
-.edit{height:28px!important;margin:0!important;border:1px dashed transparent!important;background:transparent!important;text-align:center!important}
-.savebar{background:#fff;border:1px solid #ddd;border-radius:4px;padding:12px;display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
-.note{color:red;font-weight:700}
-.profile-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}.profile-row{display:grid;grid-template-columns:1fr 1fr;gap:60px}.profile-field{margin-bottom:14px}.profile-field label{font-size:14px;margin-bottom:4px}.money-input{text-align:right!important}.negative{color:red!important}
-@media(max-width:900px){.sidebar{position:relative;width:100%;height:auto}.main{margin-left:0}.grid2,.stats,.profile-grid,.profile-row{grid-template-columns:1fr}}
-.link-edit-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}.link-edit-grid label{display:block;font-weight:700;margin:8px 0 6px}.link-edit-grid input{width:100%;height:34px;border:1px solid #c7ccd3;border-radius:3px;padding:5px 8px}@media(max-width:900px){.link-edit-grid{grid-template-columns:1fr}}</style>
-</head>
-<body>
+    :root{--top:#3f4a60;--top2:#566276;--side:#6f7a8d;--sideDark:#59667b;--bg:#e8edf2;--dark:#3f4a60;--text:#142235}
+    *{box-sizing:border-box} body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#394459;color:var(--text);font-size:14px} button,input,select{font-family:inherit} button{cursor:pointer}
+    .login-page{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:16px;background:#394459}.login-card{width:420px;background:#fff;border-radius:4px;box-shadow:0 9px 22px rgba(0,0,0,.35);overflow:hidden}.login-head{height:68px;display:flex;align-items:center;padding:0 26px;border-bottom:1px solid #ddd}.bar,.mini{display:inline-block;width:5px;height:23px;background:var(--dark);border-radius:3px;margin-right:10px}.login-head h1{font-size:20px;margin:0}.login-body{padding:34px 30px}.field{margin-bottom:16px}.field label{display:block;font-size:13px;font-weight:700;margin-bottom:7px}.field input,.field select,.login-body input,.login-body select{width:100%;height:31px;border:1px solid #c8cdd3;border-radius:3px;padding:4px 9px;background:#fff}.login-foot{border-top:1px solid #ddd;min-height:105px;display:flex;flex-direction:column;align-items:center;padding-top:15px}.btn{height:32px;padding:0 16px;border:0;border-radius:3px;background:var(--dark);color:#fff;font-weight:700}.login-links{margin-top:13px;display:flex;gap:10px;align-items:center;font-weight:700}.btn-reg{height:30px;border:2px solid #1b7985;border-radius:3px;background:#fff;color:#2d7580;font-weight:700}.forgot{color:#222;text-decoration:none}.login-error{display:none;color:#d7222d;text-align:center;font-weight:700;margin-top:12px}
+    .app{display:none;min-height:100vh;background:var(--bg)}.app-login .app{display:none}.app-dash .login-page{display:none}.app-dash .app{display:block}.topbar{position:fixed;z-index:20;top:0;left:0;right:0;height:46px;background:var(--top);color:#eef3fb;display:flex;align-items:center;box-shadow:0 2px 6px rgba(0,0,0,.24);white-space:nowrap}.top-section{height:46px;display:flex;align-items:center;gap:10px;padding:0 10px}.top-section.left{width:46%}.top-section.mid{flex:1;justify-content:center}.urlbox{height:31px;width:min(315px,45vw);background:var(--top2);border-radius:4px;display:flex;align-items:center;overflow:hidden;font-weight:700}.urlbox .ico{width:36px;text-align:center}.urlbox .u{flex:1;overflow:hidden;text-overflow:ellipsis}.copy{height:31px;width:31px;border:0;background:#6b7688;color:#fff}.money{margin-left:auto;margin-right:12px;font-weight:700}.logout{width:32px;height:32px;border:1px solid #fff;border-radius:4px;margin-right:6px;display:flex;align-items:center;justify-content:center;font-size:20px;cursor:pointer}
+    .sidebar{position:fixed;z-index:10;top:46px;left:0;bottom:0;width:226px;background:var(--side);color:#fff;transition:.25s}.welcome{height:46px;background:var(--sideDark);display:flex;align-items:center;justify-content:space-between;padding-left:14px;font-weight:700}.hamb{width:46px;height:46px;background:#4e5a70;display:flex;align-items:center;justify-content:center;font-size:24px;cursor:pointer}.menu-item{height:50px;display:flex;align-items:center;gap:12px;padding:0 20px;color:#fff;font-size:16px;cursor:pointer;border-left:4px solid transparent}.menu-item.active{background:#566276;border-left-color:#fff}.menu-item svg{width:24px;height:24px;stroke:#fff;stroke-width:1.5;fill:none}.chev{margin-left:auto}.submenu{display:none;background:#fff}.account-open .account-sub,.report-open .report-sub{display:block}.submenu-item{min-height:46px;display:flex;align-items:center;padding:8px 16px 8px 38px;color:#555;cursor:pointer}.submenu-item.active{background:#eef1f4;color:#142235;font-weight:700}.account-open .account-toggle,.report-open .report-toggle{background:#5f6b7f}.content{margin-left:226px;padding:60px 14px 22px;transition:.25s}.sidebar-collapsed .sidebar{width:58px}.sidebar-collapsed .content{margin-left:58px}.sidebar-collapsed .welcome span:first-child,.sidebar-collapsed .menu-text,.sidebar-collapsed .chev,.sidebar-collapsed .submenu{display:none}.sidebar-collapsed .menu-item{justify-content:center;padding:0}.sidebar-collapsed .hamb{width:58px}
+    .card,.panel,.profile-card{background:#fff;border-radius:4px;box-shadow:0 2px 5px rgba(0,0,0,.18);overflow:hidden}.head,.panel-head,.profile-head{height:50px;border-bottom:1px solid #ddd;display:flex;align-items:center;padding:0 18px;font-size:18px;font-weight:700}.body,.panel-body,.profile-body{padding:18px 16px}.currency{height:31px;width:75px;float:right;margin:0 4px 14px 0}.summary{clear:both;display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}.stat{min-height:145px;border-top:3px solid #7b8c99;border-radius:3px;padding:30px 16px;background:#c9dce0}.stat.green{background:#cfe4d1}.stat-title{font-weight:700}.stat-lines{float:right;display:grid;grid-template-columns:auto auto;gap:18px;margin-top:10px;color:#697485}.stat-lines .num{font-size:28px;font-weight:300;color:#506075;text-align:right}.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start}.panel.wide{grid-column:1/-1}.up{margin-left:auto;color:#888;font-size:24px}.panel.closed .panel-body{display:none}.panel.closed .up{transform:rotate(180deg)}.table-wrap{overflow-x:auto}table{width:100%;border-collapse:collapse;text-align:center;font-size:14px;min-width:520px}th{height:35px;background:#e1e3e5;border:1px solid #d2d4d6;font-weight:700}td{height:34px;border-top:1px solid #ddd;padding:0 8px}tbody tr:nth-child(even){background:#eee}.dark-table th{background:var(--dark);color:#fff;border-color:var(--dark);text-align:left;white-space:nowrap}.dark-table table{min-width:1050px}.dark-table td{text-align:center}.neg,.red{color:red}.copyright{text-align:center;font-size:10px;color:#6b7480;padding:18px 0 12px}
+    .profile-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}.two-cols{display:grid;grid-template-columns:1fr 1fr;gap:70px}.profile-body p{line-height:1.45;margin:0 0 20px}.badge{background:#31aa42;color:#fff;border-radius:12px;padding:2px 9px;font-size:12px;font-weight:700}.pill{display:inline-block;border:1px solid #e21e2b;color:#e21e2b;border-radius:12px;padding:2px 8px;font-size:12px;margin:3px 2px}.tabs{display:flex;gap:8px;flex-wrap:wrap}.tab{padding:9px 16px;cursor:pointer}.tab.active{background:var(--dark);color:#fff}.blue-line{height:4px;background:#2d3b52;margin-bottom:18px}.money-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px 34px}.profit-row{border-top:1px solid #777;padding-top:12px}.profit-row.two{display:grid;grid-template-columns:1fr 1fr}.actions{border-top:1px solid #ddd;padding:13px 0;display:flex;justify-content:flex-end;gap:8px}.actions button{height:33px;padding:0 16px;border:0;border-radius:3px;background:var(--dark);color:#fff;font-weight:700}
+    .toolbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;gap:12px}.column-btn{height:32px;border:1px solid #2d3b52;border-radius:3px;background:#fff;color:#2d3b52;padding:0 12px;font-weight:700}.search-box{display:flex;align-items:center;gap:6px}.search-box input{height:28px;width:137px;border:1px solid #c6cbd1;border-radius:3px;padding:4px 8px}.table-footer{display:flex;align-items:center;justify-content:space-between;padding:20px 0}.pagination{display:flex;gap:8px}.page-btn{min-width:28px;height:30px;border:1px solid #c9ced6;border-radius:4px;background:#fff;color:#2d3b52;font-weight:700}.page-btn.active{background:#2d3b52;color:#fff}.page-btn.disabled{opacity:.4}.filter-btn{height:33px;background:var(--dark);color:#fff;border:0;border-radius:3px;padding:0 12px;font-size:15px;font-weight:700;margin-bottom:18px}.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:24px}.form-grid.three{grid-template-columns:1fr 1fr 1fr}.empty{text-align:center!important;background:#f4f4f4}.edit-btn{width:20px;height:20px;border:0;border-radius:3px;background:var(--dark);color:#fff}.toast{position:fixed;right:18px;bottom:18px;z-index:50;background:#26364d;color:#fff;padding:11px 15px;border-radius:4px;box-shadow:0 4px 12px rgba(0,0,0,.25);opacity:0;transform:translateY(12px);transition:.25s;pointer-events:none}.toast.show{opacity:1;transform:translateY(0)}
+    @media(max-width:760px){.topbar{display:grid;grid-template-columns:1fr auto;height:auto}.top-section.left,.top-section.mid{grid-column:1/3;width:100%;justify-content:flex-start}.top-label{display:none}.urlbox{width:100%}.sidebar{top:122px;width:58px}.content{margin-left:58px;padding:136px 8px 14px}.menu-text,.chev,.welcome span:first-child{display:none}.menu-item{justify-content:center;padding:0}.summary,.grid,.profile-grid,.two-cols,.money-grid,.form-grid,.form-grid.three{grid-template-columns:1fr}.toolbar{align-items:flex-start;flex-direction:column}.search-box{width:100%;justify-content:space-between}.search-box input{flex:1}}
+  
+/* MB66 login style */
+.login-page{
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:24px;
+  background:linear-gradient(135deg,#5d5af7 0%,#805fff 48%,#b35cf5 100%)!important;
+}
+.mb-login-card{
+  width:min(1250px,92vw);
+  min-height:610px;
+  display:grid;
+  grid-template-columns:1.35fr .9fr;
+  background:#fff;
+  box-shadow:0 24px 55px rgba(30,24,97,.32);
+  overflow:hidden;
+}
+.mb-login-left{
+  position:relative;
+  overflow:hidden;
+  padding:62px 54px;
+  color:#fff;
+  background:
+    radial-gradient(circle at 76% 18%,rgba(255,117,133,.82) 0 90px,transparent 92px),
+    linear-gradient(135deg,#5e61ff 0%,#8061f2 44%,#ff5f9c 100%);
+}
+.mb-brand{position:relative;z-index:2}
+.mb-brand h1{font-size:52px;line-height:1;margin:0 0 18px;font-weight:800;letter-spacing:.5px;color:#fff}
+.mb-brand p{font-size:25px;line-height:1.45;margin:0;color:#fff}
+.mb-shape,.mb-line{position:absolute;display:block;border-radius:50px;transform:rotate(-45deg);opacity:.95}
+.mb-shape.s1{width:180px;height:72px;left:-35px;bottom:70px;background:linear-gradient(90deg,#ff5f9c,#ac63f2)}
+.mb-shape.s2{width:220px;height:78px;left:210px;bottom:-8px;background:linear-gradient(90deg,#ffb75f,#f45aa8,#8360ee)}
+.mb-shape.s3{width:235px;height:78px;right:95px;bottom:18px;background:linear-gradient(90deg,#7e61ee,#ff6c9b,#ffb35b)}
+.mb-line{height:8px;background:linear-gradient(90deg,#ffb85f,#ff6aa8);z-index:1}
+.mb-line.l1{width:185px;left:165px;bottom:75px}
+.mb-line.l2{width:160px;left:300px;bottom:170px}
+.mb-line.l3{width:132px;right:78px;bottom:48px}
+.mb-line.l4{width:118px;left:42px;bottom:110px}
+.mb-login-right.login-card{
+  width:auto;
+  border-radius:0;
+  box-shadow:none;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  padding:0 52px;
+  background:#fff;
+}
+.mb-login-right .login-head{
+  height:auto;
+  border:0;
+  padding:0;
+  margin-bottom:26px;
+  display:block;
+  text-align:center;
+}
+.mb-login-right .login-head h1{
+  font-size:29px;
+  color:#7b5df7;
+  font-weight:500;
+  margin:0;
+}
+.mb-login-right .login-body{
+  width:100%;
+  max-width:330px;
+  padding:0;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+}
+.mb-field{
+  width:100%;
+  height:52px;
+  border-radius:28px;
+  background:#e8ddff;
+  margin-bottom:24px;
+  display:flex;
+  align-items:center;
+  padding:0 18px;
+}
+.mb-field input{
+  border:0!important;
+  background:transparent!important;
+  height:100%!important;
+  outline:none;
+  color:#7c5df4;
+  font-size:16px;
+  padding:0 8px!important;
+}
+.mb-field input::placeholder{color:#7c5df4;opacity:.9}
+.mb-ico,.mb-eye{color:#755bf2;font-size:16px;line-height:1}
+.mb-eye{margin-left:auto;opacity:.85}
+.mb-login-btn{
+  width:100%;
+  height:62px;
+  border-radius:30px;
+  font-size:24px;
+  font-weight:800;
+  background:linear-gradient(90deg,#695cff,#b85deb)!important;
+  box-shadow:none;
+  margin-bottom:20px;
+}
+.mb-lang{
+  align-self:flex-start;
+  width:auto!important;
+  height:42px!important;
+  border:1px solid #2c7cff!important;
+  border-radius:22px!important;
+  color:#2b73ff!important;
+  background:#fff!important;
+  padding:0 14px!important;
+  font-size:16px;
+}
+.mb-login-right .login-error{
+  width:100%;
+  margin-top:18px;
+  text-align:center;
+}
+.mb-login-right .login-foot{display:none}
+@media(max-width:900px){
+  .mb-login-card{grid-template-columns:1fr;min-height:auto}
+  .mb-login-left{min-height:240px;padding:34px}
+  .mb-brand h1{font-size:42px}
+  .mb-brand p{font-size:20px}
+  .mb-login-right.login-card{padding:42px 24px}
+}
 
-<section class="login-page" id="loginPage">
-  <div class="login-box">
-    <div class="title">Đăng nhập Hậu Đài Tổng</div>
-    <div class="body">
-      <p class="error" id="loginError">Sai tài khoản hoặc mật khẩu</p>
-      <label>Tên tài khoản</label><input id="adminUser">
-      <label>Mật khẩu</label><input id="adminPass" type="password">
-      <button onclick="loginAdmin()">Đăng nhập</button>
-      <p>Admin: <b>admin</b> / <b>admin123</b></p>
+.topbar .money{display:none!important}
+</style>
+</head>
+<body class="app-login">
+<section class="login-page">
+  <div class="mb-login-card">
+    <div class="mb-login-left">
+      <div class="mb-brand">
+        <h1>MB66</h1>
+        <p>Hệ thống quản lý đầu cuối dành cho Bên nhượng quyền</p>
+      </div>
+      <div class="mb-sun"></div>
+      <span class="mb-shape s1"></span>
+      <span class="mb-shape s2"></span>
+      <span class="mb-shape s3"></span>
+      <span class="mb-line l1"></span>
+      <span class="mb-line l2"></span>
+      <span class="mb-line l3"></span>
+      <span class="mb-line l4"></span>
     </div>
+    <main class="login-card mb-login-right">
+      <header class="login-head"><h1>Đăng Nhập</h1></header>
+      <section class="login-body">
+        <div class="field mb-field"><span class="mb-ico">👤</span><input autocomplete="username" id="username" type="text" placeholder="Xin Vui Lòng Nhập Tài Khoản"/></div>
+        <div class="field mb-field"><span class="mb-ico">🔒</span><input autocomplete="current-password" id="password" type="password" placeholder="Xin Vui Lòng Nhập Mật Khẩu"/><span class="mb-eye">◕</span></div>
+        <button class="btn mb-login-btn" id="loginBtn" type="button">Đăng Nhập</button>
+        <select id="language" class="mb-lang"><option>🇻🇳 Việt Nam</option><option>English</option></select>
+        <div class="login-error" id="loginError">Vui lòng nhập tên tài khoản và mật khẩu.</div>
+      </section>
+      <footer class="login-foot"><div class="login-links"><a class="forgot" href="#" id="forgotLink">Quên mật khẩu</a></div></footer>
+    </main>
   </div>
 </section>
-
-<section class="app" id="appPage">
-  <aside class="sidebar">
-    <div class="logo">Welcome <span>≡</span></div>
-    <div class="menu" id="mainMenu">
-      <div class="active" onclick="showMain('dashboard',this)">🏠 Bảng Điều Khiển</div>
-      <div onclick="showMain('create',this)">➕ Tạo Hậu Đài</div>
-      <div onclick="showMain('manage',this)">📋 Quản Lý Hậu Đài</div>
-    </div>
-    <div class="menu hidden" id="editMenu">
-      <div class="active" onclick="showEditor('edDashboard',this)">🏠 Bảng điều khiển</div>
-      <div onclick="showEditor('edProfile',this)">👤 Tài khoản của tôi</div>
-      <div class="sub" onclick="showEditor('edProfile',this)">Hồ sơ</div>
-      <div onclick="showEditor('edMaterials',this)">🔗 Nguyên liệu</div>
-      <div onclick="showEditor('edMembers',this)">📊 Báo cáo</div>
-      <div class="sub" onclick="showEditor('edMembers',this)">Tìm kiếm thành viên</div>
-      <div class="sub" onclick="showEditor('edFirst',this)">Đăng ký & Lần nạp đầu tiên</div>
-      <div class="sub" onclick="showEditor('edPerformance',this)">Hiệu suất của người chơi</div>
-      <div class="sub" onclick="showEditor('edCommission',this)">Hoa hồng</div>
-    </div>
-  </aside>
-
-  <main class="main">
-    <div class="top"><h2 id="pageTitle">Hậu Đài Tổng Firebase V13</h2><button onclick="logoutAdmin()">Đăng xuất</button></div>
-
-    <div id="dashboardPage">
-      <div class="stats">
-        <div class="stat">Tổng Hậu Đài<div class="num" id="totalAgents">0</div></div>
-        <div class="stat">Đang Hoạt Động<div class="num" id="activeAgents">0</div></div>
-        <div class="stat">Tạm Khóa<div class="num" id="lockedAgents">0</div></div>
-      </div>
-    </div>
-
-    <div id="createPage" class="hidden">
-      <div class="box"><div class="title">Tạo Tài Khoản Hậu Đài</div><div class="body">
-        <p class="ok" id="msg"></p>
-        <label>Tên tài khoản</label><input id="newUser" placeholder="Ví dụ: agent01">
-        <label>Mật khẩu</label><input id="newPass" placeholder="Ví dụ: 123456">
-        <label>Tên hiển thị</label><input id="newName" placeholder="Có thể bỏ trống">
-        <button onclick="createAgent()">Tạo Hậu Đài</button>
-      </div></div>
-    </div>
-
-    <div id="managePage" class="hidden">
-      <div class="box"><div class="title">Quản Lý Hậu Đài</div><div class="body">
-        <input id="searchInput" placeholder="Tìm kiếm tài khoản..." oninput="renderTable()">
-        <table><thead><tr><th>STT</th><th>Tài khoản</th><th>Mật khẩu</th><th>Tên</th><th>Trạng thái</th><th>Quản Lý</th><th>Thao tác</th></tr></thead><tbody id="agentTable"></tbody></table>
-      </div></div>
-    </div>
-
-    <div id="editorPage" class="hidden">
-      <div class="savebar">
-        <div><b id="editTitle">Đang quản lý</b> <span class="note">Sửa xong bấm Lưu để cập nhật Firebase</span></div>
-        <div><button class="btn-blue" onclick="saveCurrentAgent()">Lưu tất cả</button><button class="btn-gray" onclick="backManage()">Quay lại</button></div>
-      </div>
-
-      <div id="edDashboard">
-        <div class="grid2">
-          <div class="kpi"><h3>Hoa hồng</h3><div class="lab1">Kỳ này</div><input class="v1 money-input" id="e_commissionCurrent" oninput="formatMoney(this)"><div class="lab2">Kỳ trước</div><input class="v2 money-input" id="e_commissionPrev" oninput="formatMoney(this)"></div>
-          <div class="kpi green"><h3>Đang hoạt động</h3><div class="lab1">Kỳ này</div><input class="v1" id="e_activeCurrent"><div class="lab2">Kỳ trước</div><input class="v2" id="e_activePrev"></div>
-        </div>
-        <div class="box">
-          <div class="mini-title">Sửa link phía trên hậu đài con</div>
-          <div class="body link-edit-grid">
-            <div>
-              <label>Liên kết Đăng ký Người chơi Mặc định</label>
-              <input id="e_registerLink" placeholder="Ví dụ: bj66.vip/af/tom22/join">
-            </div>
-            <div>
-              <label>Liên kết Giới thiệu Liên kết</label>
-              <input id="e_referralLink" placeholder="Ví dụ: betjili11.vip/saf/tom22">
-            </div>
-          </div>
-        </div>
-        <div class="box"><div class="mini-title">Các bảng thống kê Dashboard</div><div class="body" id="metricsWrap"></div></div>
-      </div>
-
-      <div id="edProfile" class="hidden">
-        <div class="profile-grid">
-          <div class="box"><div class="mini-title">Hồ sơ</div><div class="body profile-row">
-            <div><div class="profile-field"><label>Tên tài khoản</label><input id="e_username"></div><div class="profile-field"><label>Mật khẩu</label><input id="e_password"></div><div class="profile-field"><label>Tên</label><input id="e_firstName"></div><div class="profile-field"><label>Họ</label><input id="e_lastName"></div></div>
-            <div><div class="profile-field"><label>Trạng thái</label><select id="e_status"><option>Hoạt động</option><option>Tạm khóa</option></select></div><div class="profile-field"><label>Mã giới thiệu</label><input id="e_refCode"></div><div class="profile-field"><label>Số điện thoại</label><input id="e_phone"></div><div class="profile-field"><label>Email</label><input id="e_email"></div><div class="profile-field"><label>Ngân hàng</label><select id="e_bankName"><option value="">Chọn ngân hàng</option><option>Vietcombank</option><option>VietinBank</option><option>BIDV</option><option>Agribank</option><option>Techcombank</option><option>MB Bank</option><option>ACB</option><option>Sacombank</option><option>VPBank</option><option>TPBank</option><option>HDBank</option><option>VIB</option><option>SHB</option><option>Eximbank</option><option>MSB</option><option>OCB</option><option>SeABank</option><option>LienVietPostBank</option><option>Nam A Bank</option><option>Bac A Bank</option><option>PVcomBank</option><option>ABBank</option><option>KienlongBank</option><option>NCB</option><option>Saigonbank</option><option>VietBank</option><option>BaoViet Bank</option><option>PG Bank</option><option>GPBank</option><option>CBBank</option><option>OceanBank</option></select></div><div class="profile-field"><label>Số tài khoản</label><input id="e_bankNumber"></div><div class="profile-field"><label>Tên tài khoản</label><input id="e_bankAccountName" readonly></div></div>
-          </div></div>
-          <div class="box"><div class="mini-title">Tiềm năng / Hoa hồng</div><div class="body profile-row">
-            <div><label>Tổng Lãi Lỗ</label><input class="money-input" id="e_totalProfitLoss" oninput="formatMoney(this)"><label>Tổng Tiền Thưởng</label><input class="money-input" id="e_totalBonus" oninput="formatMoney(this)"><label>Lợi nhuận ròng</label><input class="money-input" id="e_netProfit" oninput="formatMoney(this)"></div>
-            <div><label>Thu nhập</label><input class="money-input" id="e_income" oninput="formatMoney(this)"><label>Đợi</label><input class="money-input" id="e_commissionPending" oninput="formatMoney(this)"><label>Có sẵn</label><input class="money-input" id="e_commissionAvailable" oninput="formatMoney(this)"></div>
-          </div></div>
-        </div>
-      </div>
-
-      <div id="edMaterials" class="hidden">
-        <div class="box"><div class="mini-title">Đường dẫn</div><div class="body"><button class="btn-green" onclick="addRow('materials')">Thêm dòng</button><div id="materialsWrap"></div></div></div>
-      </div>
-
-      <div id="edMembers" class="hidden"><div class="box"><div class="mini-title">Tìm kiếm thành viên</div><div class="body"><button class="btn-green" onclick="addRow('members')">Thêm dòng</button><div id="membersWrap"></div></div></div></div>
-      <div id="edFirst" class="hidden"><div class="box"><div class="mini-title">Đăng ký & Lần nạp đầu tiên</div><div class="body"><button class="btn-green" onclick="addRow('firstDepositRows')">Thêm dòng</button><div id="firstWrap"></div></div></div></div>
-      <div id="edPerformance" class="hidden"><div class="box"><div class="mini-title">Hiệu suất của người chơi</div><div class="body"><button class="btn-green" onclick="addRow('performanceRows')">Thêm dòng</button><div id="performanceWrap"></div></div></div></div>
-      <div id="edCommission" class="hidden"><div class="box"><div class="mini-title">Hoa hồng</div><div class="body"><button class="btn-green" onclick="addRow('commissionReportRows')">Thêm dòng</button><div id="commissionWrap"></div></div></div></div>
-    </div>
-  </main>
+<section class="app">
+<div class="topbar">
+<div class="top-section left"><span class="top-label">Liên kết Đăng ký Người chơi Mặc định</span><div class="urlbox"><span class="ico">🔗</span><span class="u">bj66.vip/af/ZxA3mbxl/join</span><button class="copy js-copy" type="button">▣</button></div></div>
+<div class="top-section mid"><span class="top-label">Liên kết Giới thiệu Liên kết</span><div class="urlbox"><span class="ico">🔗</span><span class="u">betjili11.vip/saf/ZxA3mbxl</span><button class="copy js-copy" type="button">▣</button></div></div>
+<div class="money">₫ 0.00</div><div class="logout" id="logoutBtn">↪</div>
+</div>
+<aside class="sidebar">
+<div class="welcome"><span>Welcome</span><span class="hamb" id="hambBtn">≡</span></div>
+<div class="menu-item active" data-menu="dashboard" id="dashboardMenu"><svg viewbox="0 0 24 24"><path d="M3 11.5 12 3l9 8.5"></path><path d="M5 10.5V21h5v-6h4v6h5V10.5"></path></svg><span class="menu-text">Bảng điều khiển</span></div>
+<div class="menu-item account-toggle" id="accountToggle"><svg viewbox="0 0 24 24"><circle cx="12" cy="7" r="4"></circle><path d="M4 21c1-5 15-5 16 0"></path></svg><span class="menu-text">Tài khoản của tôi</span><span class="chev">⌃</span></div>
+<div class="submenu account-sub"><div class="submenu-item" data-menu="profile" id="profileMenu">Hồ sơ</div></div>
+<div class="menu-item" data-menu="materials" id="materialsMenu"><svg viewbox="0 0 24 24"><circle cx="6" cy="6" r="2"></circle><circle cx="18" cy="6" r="2"></circle><circle cx="6" cy="18" r="2"></circle><circle cx="18" cy="18" r="2"></circle><path d="M8 6h8M6 8v8M18 8v8M8 18h8"></path></svg><span class="menu-text">Nguyên liệu</span></div>
+<div class="menu-item report-toggle" id="reportToggle"><svg viewbox="0 0 24 24"><path d="M4 21V10h4v11M10 21V4h4v17M16 21V8h4v13"></path></svg><span class="menu-text">Báo cáo</span><span class="chev">⌄</span></div>
+<div class="submenu report-sub"><div class="submenu-item" data-menu="memberSearch" id="memberSearchMenu">Tìm kiếm thành viên</div><div class="submenu-item" data-menu="firstDeposit" id="firstDepositMenu">Đăng ký &amp; Lần nạp đầu tiên</div><div class="submenu-item" data-menu="playerPerformance" id="playerPerformanceMenu">Hiệu suất của người chơi</div><div class="submenu-item" data-menu="commissionReport" id="commissionMenu">Hoa hồng</div></div>
+</aside>
+<main class="content">
+<div id="dashboardPage"><select class="currency"><option>VND</option></select><div class="summary"><div class="stat"><div class="stat-title">Hoa hồng</div><div class="stat-lines"><b>Kỳ này</b><span class="num">₫328.49</span><b>Kỳ trước</b><span class="num">₫0</span></div></div><div class="stat green"><div class="stat-title">Đang hoạt động</div><div class="stat-lines"><b>Kỳ này</b><span class="num">37</span><b>Kỳ trước</b><span class="num">56</span></div></div></div><div class="grid" id="panels"></div></div>
+<div id="profilePage" style="display:none"></div>
+<div id="materialsPage" style="display:none"></div>
+<div id="memberSearchPage" style="display:none"></div>
+<div id="firstDepositPage" style="display:none"></div>
+<div id="playerPerformancePage" style="display:none"></div>
+<div id="commissionReportPage" style="display:none"></div>
+<div class="copyright dashboard-copy">Copyright © 2024, All rights Reserved</div>
+</main>
 </section>
-
-
+<div class="toast" id="toast"></div>
 <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-database-compat.js"></script>
 <script>
-const firebaseConfig = {
-  apiKey: "AIzaSyAaWnJfB_cSmoZ0t2qm9ThXrvxcp7hpEDE",
-  authDomain: "hau-dai-tong.firebaseapp.com",
-  databaseURL: "https://hau-dai-tong-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "hau-dai-tong",
-  storageBucket: "hau-dai-tong.firebasestorage.app",
-  messagingSenderId: "546700909302",
-  appId: "1:546700909302:web:30f635c302f7a6b50bead7"
-};
-firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
-const FIREBASE_READER_EMAIL = "agentreader@gmail.com";
-const FIREBASE_READER_PASSWORD = "735198aa";
+(function(){
+  'use strict';
+  const KEY='hauDaiTongDB_stable';
+  const $=(id)=>document.getElementById(id);
+  const pages=['dashboardPage','profilePage','materialsPage','memberSearchPage','firstDepositPage','playerPerformancePage','commissionReportPage'];
+  const periods=['Hôm nay','Hôm qua','Tuần này','Tuần trước','Tháng này','Tháng trước'];
+  const metricNames=['Người dùng đã đăng ký','Khoản tiền gửi đầu tiên','Tiền gửi','Rút tiền','Lỗ Lãi Chi Nhánh'];
+  let db={accounts:[]}, current=null, toastTimer=null, firebaseLoaded=false, firebaseError='';
+  const firebaseConfig = {
+    apiKey: "AIzaSyAaWnJfB_cSmoZ0t2qm9ThXrvxcp7hpEDE",
+    authDomain: "hau-dai-tong.firebaseapp.com",
+    databaseURL: "https://hau-dai-tong-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "hau-dai-tong",
+    storageBucket: "hau-dai-tong.firebasestorage.app",
+    messagingSenderId: "546700909302",
+    appId: "1:546700909302:web:30f635c302f7a6b50bead7"
+  };
+  if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+  const FIREBASE_READER_EMAIL = 'agentreader@gmail.com';
+  const FIREBASE_READER_PASSWORD = '735198aa';
 
-// Hậu đài tổng lưu tại /hauDaiData, hậu đài con cũng đọc đúng /hauDaiData
-const dbRef = firebase.database().ref("hauDaiData");
-</script>
+  // Đọc đúng nơi hậu đài tổng đang lưu: /hauDaiData/accounts
+  const dbRef = firebase.database().ref('hauDaiData');
+  function fmt(n){let v=String(n||0).replace(/VND/gi,'').trim(); if(v.includes('.')&&!v.includes(',')) v=v.replace(/\./g,''); v=v.replace(/,/g,''); return Number(v||0).toLocaleString('vi-VN',{minimumFractionDigits:2,maximumFractionDigits:2})+' VND';}
+  function toast(msg){const el=$('toast'); el.textContent=msg; el.classList.add('show'); clearTimeout(toastTimer); toastTimer=setTimeout(()=>el.classList.remove('show'),2200);}
+  function normalizeDb(data){
+    data = data || {};
 
-<script>
-let db={accounts:[]}, currentIndex=null, oldUsername=null, isSaving=false;
-const periods=["Hôm nay","Hôm qua","Tuần này","Tuần trước","Tháng này","Tháng trước"];
-const metricNames=["Người dùng đã đăng ký","Khoản tiền gửi đầu tiên","Tiền gửi","Rút tiền","Lỗ Lãi Chi Nhánh"];
-
-function zeroMetrics(){let o={};metricNames.forEach(n=>o[n]=periods.map(p=>[p,"0","0.00"]));o["Lỗ Lãi Chi Nhánh"][0][2]="0";return o}
-function ensure(a){a.id=a.id||Date.now();a.username=a.username||"";a.password=a.password||"";a.name=a.name||a.username;a.status=a.status||"Hoạt động";a.balance=a.balance||"0";a.commissionCurrent=a.commissionCurrent||"0";a.commissionPrev=a.commissionPrev||"0";a.activeCurrent=a.activeCurrent||"0";a.activePrev=a.activePrev||"0";a.profile=a.profile||{};a.profile.firstName=a.profile.firstName||a.name;a.profile.lastName=a.profile.lastName||"";a.profile.phone=a.profile.phone||"";a.profile.email=a.profile.email||"";a.profile.bankName=a.profile.bankName||"";a.profile.bankNumber=a.profile.bankNumber||"";a.profile.bankAccountName=a.profile.bankAccountName||a.profile.firstName||a.name||a.username;a.profile.refCode=a.profile.refCode||a.username;a.profile.totalProfitLoss=a.profile.totalProfitLoss||"0";a.profile.totalBonus=a.profile.totalBonus||"0";a.profile.netProfit=a.profile.netProfit||"0";a.profile.income=a.profile.income||"0";a.profile.commissionPending=a.profile.commissionPending||"0";a.profile.commissionAvailable=a.profile.commissionAvailable||"0";["members","materials","firstDepositRows","performanceRows","commissionReportRows"].forEach(k=>a[k]=Array.isArray(a[k])?a[k]:Object.values(a[k]||{}));a.metrics=a.metrics||zeroMetrics();a.registerLink=a.registerLink||("bj66.vip/af/"+a.username+"/join");a.referralLink=a.referralLink||("betjili11.vip/saf/"+a.username);return a}
-function normalize(data){data=data||{};db.accounts=Array.isArray(data.accounts)?data.accounts:Object.values(data.accounts||{});db.accounts.forEach(ensure)}
-function startFirebaseSync(){
-  dbRef.on("value",snap=>{
-    normalize(snap.val());
-    updateDashboard();
-    renderTable();
-    if(currentIndex!==null){
-      let u=oldUsername;
-      let ni=db.accounts.findIndex(a=>a.username===u);
-      if(ni>=0) currentIndex=ni;
+    // Đọc node /hauDaiData có dạng: /hauDaiData/accounts
+    if(!data.accounts){
+      const accountsObj = data || {};
+      data = {
+        accounts: Object.keys(accountsObj).map(username => {
+          const a = accountsObj[username] || {};
+          return Object.assign({
+            id: username,
+            username: a.username || username,
+            name: a.name || username,
+            password: a.password || '',
+            status: a.status || 'active'
+          }, a);
+        })
+      };
     }
-  }, err=>{
-    alert("Không đọc được Firebase: " + (err && err.message ? err.message : err));
-    console.error(err);
-  });
-}
-auth.signInWithEmailAndPassword(FIREBASE_READER_EMAIL, FIREBASE_READER_PASSWORD)
-  .then(startFirebaseSync)
-  .catch(err=>{
-    alert("Không đăng nhập được Firebase Auth: " + (err && err.message ? err.message : err));
-    console.error(err);
-  });
-function saveDb(){if(isSaving)return Promise.resolve();isSaving=true;return dbRef.set(db).catch(err=>{alert("Không lưu được Firebase: "+(err&&err.message?err.message:err));console.error(err);throw err}).finally(()=>isSaving=false)}
 
-function loginAdmin(){if(adminUser.value.trim()==="admin"&&adminPass.value.trim()==="admin123"){loginPage.style.display="none";appPage.style.display="block";updateDashboard();renderTable()}else loginError.style.display="block"}
-function logoutAdmin(){appPage.style.display="none";loginPage.style.display="flex"}
-function hideMain(){dashboardPage.classList.add("hidden");createPage.classList.add("hidden");managePage.classList.add("hidden");editorPage.classList.add("hidden")}
-function showMain(p,el){mainMenu.classList.remove("hidden");editMenu.classList.add("hidden");hideMain();document.getElementById(p+"Page").classList.remove("hidden");document.querySelectorAll("#mainMenu div").forEach(x=>x.classList.remove("active"));el.classList.add("active");pageTitle.innerText="Hậu Đài Tổng Firebase V13"}
-function createAgent(){let username=newUser.value.trim(),password=newPass.value.trim(),name=newName.value.trim()||username;if(!username||!password){alert("Nhập tài khoản và mật khẩu");return}if(db.accounts.some(a=>a.username===username)){alert("Tài khoản đã tồn tại");return}let agent=ensure({id:Date.now(),username,password,name,status:"Hoạt động",balance:"0",commissionCurrent:"0",commissionPrev:"0",activeCurrent:"0",activePrev:"0",profile:{firstName:name,lastName:"",phone:"",email:"",refCode:username,totalProfitLoss:"0",totalBonus:"0",netProfit:"0",income:"0",commissionPending:"0",commissionAvailable:"0"},members:[],materials:[],firstDepositRows:[],performanceRows:[],commissionReportRows:[],metrics:zeroMetrics(),registerLink:"bj66.vip/af/"+username+"/join",referralLink:"betjili11.vip/saf/"+username});db.accounts.push(agent);saveDb().then(()=>{msg.innerText="Đã tạo tài khoản: "+username;newUser.value="";newPass.value="";newName.value="";renderTable();updateDashboard();})}
-function renderTable(){if(!agentTable)return;let key=(searchInput?.value||"").toLowerCase();agentTable.innerHTML="";db.accounts.forEach((a,i)=>{if(!a.username.toLowerCase().includes(key))return;let cls=a.status==="Tạm khóa"?"status-lock":"status-active";agentTable.innerHTML+=`<tr><td>${i+1}</td><td>${a.username}</td><td>${a.password}</td><td>${a.name}</td><td class="${cls}">${a.status}</td><td><a class="manage-link" onclick="manageAgent(${i})">Mở</a></td><td><button class="btn-green" onclick="setStatus(${i},'Hoạt động')">Mở</button><button class="btn-orange" onclick="setStatus(${i},'Tạm khóa')">Khóa</button><button class="btn-red" onclick="deleteAgent(${i})">Xóa</button></td></tr>`})}
-function setStatus(i,s){db.accounts[i].status=s;saveDb();renderTable();updateDashboard()}
-function deleteAgent(i){if(confirm("Xóa tài khoản "+db.accounts[i].username+"?")){db.accounts.splice(i,1);saveDb();renderTable();updateDashboard()}}
-function updateDashboard(){totalAgents.innerText=db.accounts.length;activeAgents.innerText=db.accounts.filter(a=>a.status!=="Tạm khóa").length;lockedAgents.innerText=db.accounts.filter(a=>a.status==="Tạm khóa").length}
+    if(!Array.isArray(data.accounts)) {
+      data.accounts = Object.keys(data.accounts || {}).map(username => {
+        const a = data.accounts[username] || {};
+        return Object.assign({
+          id: username,
+          username: a.username || username,
+          name: a.name || username,
+          password: a.password || '',
+          status: a.status || 'active'
+        }, a);
+      });
+    }
 
-function manageAgent(i){currentIndex=i;oldUsername=db.accounts[i].username;mainMenu.classList.add("hidden");editMenu.classList.remove("hidden");hideMain();editorPage.classList.remove("hidden");pageTitle.innerText="Đang quản lý: "+oldUsername;loadEditor();showEditor('edDashboard',document.querySelector("#editMenu div"))}
-function backManage(){saveCurrentAgent();mainMenu.classList.remove("hidden");editMenu.classList.add("hidden");hideMain();managePage.classList.remove("hidden");pageTitle.innerText="Hậu Đài Tổng Firebase V13";renderTable()}
-function showEditor(id,el){["edDashboard","edProfile","edMaterials","edMembers","edFirst","edPerformance","edCommission"].forEach(x=>document.getElementById(x).classList.add("hidden"));document.getElementById(id).classList.remove("hidden");document.querySelectorAll("#editMenu div").forEach(x=>x.classList.remove("active"));el.classList.add("active")}
-function A(){return db.accounts[currentIndex]}
-
-
-function syncBankAccountName(){
-  if(document.getElementById("e_bankAccountName")){
-    e_bankAccountName.value = (e_firstName.value || e_username.value || "").trim();
+    data.accounts.forEach(a=>{
+      if(!Array.isArray(a.members)) a.members = Object.values(a.members || {});
+      if(!Array.isArray(a.materials)) a.materials = Object.values(a.materials || {});
+      if(!Array.isArray(a.firstDepositRows)) a.firstDepositRows = Object.values(a.firstDepositRows || {});
+      if(!Array.isArray(a.performanceRows)) a.performanceRows = Object.values(a.performanceRows || {});
+      if(!Array.isArray(a.commissionReportRows)) a.commissionReportRows = Object.values(a.commissionReportRows || {});
+      if(a.metrics && a.metrics['Lỗ/ Lãi Chi Nhánh'] && !a.metrics['Lỗ Lãi Chi Nhánh']){
+        a.metrics['Lỗ Lãi Chi Nhánh'] = a.metrics['Lỗ/ Lãi Chi Nhánh'];
+        delete a.metrics['Lỗ/ Lãi Chi Nhánh'];
+      }
+    });
+    return data;
   }
-}
-document.addEventListener("input", function(e){
-  if(e.target && (e.target.id==="e_firstName" || e.target.id==="e_username")) syncBankAccountName();
-});
-
-function loadEditor(){let a=A();e_username.value=a.username;e_password.value=a.password;e_firstName.value=a.profile.firstName;e_lastName.value=a.profile.lastName;e_status.value=a.status;e_refCode.value=a.profile.refCode;e_phone.value=a.profile.phone;e_email.value=a.profile.email;if(document.getElementById("e_bankName")) e_bankName.value=a.profile.bankName||"";if(document.getElementById("e_bankNumber")) e_bankNumber.value=a.profile.bankNumber||"";if(document.getElementById("e_bankAccountName")) e_bankAccountName.value=a.profile.bankAccountName||a.profile.firstName||a.name||a.username;e_totalProfitLoss.value=a.profile.totalProfitLoss;e_totalBonus.value=a.profile.totalBonus;e_netProfit.value=a.profile.netProfit;e_income.value=a.profile.income;e_commissionPending.value=a.profile.commissionPending;e_commissionAvailable.value=a.profile.commissionAvailable;e_commissionCurrent.value=a.commissionCurrent;e_commissionPrev.value=a.commissionPrev;e_activeCurrent.value=a.activeCurrent;e_activePrev.value=a.activePrev;if(document.getElementById('e_registerLink')) e_registerLink.value=a.registerLink||('bj66.vip/af/'+a.username+'/join');if(document.getElementById('e_referralLink')) e_referralLink.value=a.referralLink||('betjili11.vip/saf/'+a.username);renderMetrics();renderAllTables()}
-function saveCurrentAgent(){
-  if(currentIndex===null) return;
-  let a=A();
-  const oldUser = a.username;
-  a.username=e_username.value.trim()||a.username;
-  a.password=e_password.value;
-  a.name=e_firstName.value||a.username;
-  a.profile.firstName=e_firstName.value;
-  a.profile.lastName=e_lastName.value;
-  a.status=e_status.value;
-  a.profile.status=e_status.value;
-  a.profile.refCode=e_refCode.value;
-  a.profile.phone=e_phone.value;
-  a.profile.email=e_email.value;if(document.getElementById("e_bankName")) a.profile.bankName=e_bankName.value;if(document.getElementById("e_bankNumber")) a.profile.bankNumber=e_bankNumber.value;if(document.getElementById("e_bankAccountName")) a.profile.bankAccountName=(e_firstName.value||a.name||a.username).trim();
-  a.profile.totalProfitLoss=e_totalProfitLoss.value;
-  a.profile.totalBonus=e_totalBonus.value;
-  a.profile.netProfit=e_netProfit.value;
-  a.profile.income=e_income.value;
-  a.profile.commissionPending=e_commissionPending.value;
-  a.profile.commissionAvailable=e_commissionAvailable.value;
-  a.commissionCurrent=e_commissionCurrent.value;
-  a.commissionPrev=e_commissionPrev.value;
-  a.activeCurrent=e_activeCurrent.value;
-  a.activePrev=e_activePrev.value;
-
-  // Lưu 2 link phía trên hậu đài con
-  if(document.getElementById('e_registerLink')){
-    a.registerLink = e_registerLink.value.trim() || ('bj66.vip/af/'+a.username+'/join');
+  function load(){try{db=normalizeDb(JSON.parse(localStorage.getItem(KEY))||{accounts:[]});}catch(e){db={accounts:[]};}}
+  function saveLocal(){localStorage.setItem(KEY,JSON.stringify(db)); try{new BroadcastChannel('hauDaiSync').postMessage({type:'db-updated'});}catch(e){}}
+  function startFirebaseSync(){
+    dbRef.on('value', snap=>{
+      firebaseLoaded=true;
+      firebaseError='';
+      const data=snap.val();
+      db=normalizeDb(data || {accounts:[]});
+      saveLocal();
+      const savedUser=sessionStorage.getItem('childUsername');
+      const savedId=sessionStorage.getItem('childAccountId');
+      if(savedUser || savedId){
+        current=db.accounts.find(a=>String(a.id)===String(savedId))||db.accounts.find(a=>String(a.username)===String(savedUser))||current;
+        if(current) ensure(current);
+      }
+      $('loginBtn').disabled=false;
+      $('loginBtn').textContent='Đăng nhập';
+      if(document.body.classList.contains('app-dash')) renderAll();
+    }, err=>{
+      firebaseLoaded=true;
+      firebaseError=(err && err.message) ? err.message : String(err);
+      console.error('Firebase read error:', err);
+      $('loginBtn').disabled=false;
+      $('loginBtn').textContent='Đăng nhập';
+      $('loginError').textContent='Không đọc được Firebase: '+firebaseError;
+      $('loginError').style.display='block';
+    });
   }
-  if(document.getElementById('e_referralLink')){
-    a.referralLink = e_referralLink.value.trim() || ('betjili11.vip/saf/'+a.username);
+  function zeroMetrics(){const out={}; metricNames.forEach(n=>out[n]=periods.map(p=>[p,'0','0.00'])); return out;}
+  function ensure(a){a.profile=a.profile||{firstName:a.name||a.username,lastName:'',phone:'',email:'',bankName:'',bankNumber:'',bankAccountName:'',refCode:a.username,totalProfitLoss:'0.00',totalBonus:'0.00',totalRecycle:'0.00',totalCancel:'0.00',vipBonus:'0.00',transactionFee:'0.00',netProfit:'0.00',income:'0.00',commissionPending:'0.00',commissionAvailable:'0.00',withdrawProcessing:'0.00'}; a.members=a.members||[]; a.materials=a.materials||[]; a.firstDepositRows=a.firstDepositRows||[]; a.performanceRows=a.performanceRows||[]; a.commissionReportRows=a.commissionReportRows||[]; a.id=a.id||Date.now(); a.username=a.username||''; a.password=a.password||''; a.name=a.name||a.username; a.status=a.status||'Hoạt động'; a.balance=a.balance||'0'; a.commissionCurrent=a.commissionCurrent||'0'; a.commissionPrev=a.commissionPrev||'0'; a.activeCurrent=a.activeCurrent||'0'; a.activePrev=a.activePrev||'0'; a.metrics=a.metrics||zeroMetrics(); a.registerLink=a.registerLink||('bj66.vip/af/'+a.username+'/join'); a.referralLink=a.referralLink||('betjili11.vip/saf/'+a.username); return a;}
+  function active(){const id=sessionStorage.getItem('childAccountId'), user=sessionStorage.getItem('childUsername'); current=db.accounts.find(a=>String(a.id)===String(id))||db.accounts.find(a=>a.username===user)||null; if(current) ensure(current); return current;}
+  async function login(){
+    const u=$('username').value.trim(), p=$('password').value.trim();
+    $('loginError').style.display='none';
+    if(!u || !p){$('loginError').textContent='Vui lòng nhập tên tài khoản và mật khẩu.'; $('loginError').style.display='block'; return false;}
+    if(!firebaseLoaded){
+      $('loginBtn').disabled=true; $('loginBtn').textContent='Đang tải dữ liệu...';
+      try{const snap=await dbRef.once('value'); db=normalizeDb(snap.val()||{accounts:[]}); saveLocal(); firebaseLoaded=true;}
+      catch(err){firebaseLoaded=true; firebaseError=(err&&err.message)?err.message:String(err); $('loginBtn').disabled=false; $('loginBtn').textContent='Đăng nhập'; $('loginError').textContent='Không đọc được Firebase: '+firebaseError; $('loginError').style.display='block'; return false;}
+      $('loginBtn').disabled=false; $('loginBtn').textContent='Đăng nhập';
+    }
+    if(firebaseError){$('loginError').textContent='Không đọc được Firebase: '+firebaseError; $('loginError').style.display='block'; return false;}
+    const userAccount = db.accounts.find(x=>String(x.username||'').trim()===u);
+    if(!userAccount){
+      $('loginError').textContent='Tài khoản không tồn tại';
+      $('loginError').style.display='block';
+      return false;
+    }
+    if(String(userAccount.password||'').trim()!==p){
+      $('loginError').textContent='Sai tài khoản hoặc mật khẩu';
+      $('loginError').style.display='block';
+      return false;
+    }
+    const a = userAccount;
+    if(['Tạm khóa','locked','inactive','disabled','blocked'].includes(String(a.status||'').trim())){$('loginError').textContent='Tài khoản này đang bị khóa.'; $('loginError').style.display='block'; return false;}
+    sessionStorage.setItem('childAccountId',a.id); sessionStorage.setItem('childUsername',a.username); current=ensure(a); $('loginError').style.display='none'; document.body.className='app-dash'; renderAll(); toast('Đăng nhập thành công'); return true;
   }
-
-  saveMetrics();
-  saveTables();
-  oldUsername=a.username;
-  return saveDb().then(()=>{
-    renderTable();
-    updateDashboard();
-    alert('Đã lưu Firebase');
-  });
-}
-function renderMetrics(){let a=A(),h="";metricNames.forEach(name=>{h+=`<h3>${name}</h3><table><tr><th>Giai đoạn</th><th>Đếm</th><th>Số tiền</th></tr>`;(a.metrics[name]||[]).forEach((r,i)=>{h+=`<tr><td>${r[0]}</td><td><input class="edit" id="m_${name}_${i}_1" value="${r[1]}"></td><td><input class="edit money-input" oninput="formatMoney(this)" id="m_${name}_${i}_2" value="${r[2]}"></td></tr>`});h+="</table>"});metricsWrap.innerHTML=h}
-function saveMetrics(){let a=A();metricNames.forEach(name=>{(a.metrics[name]||[]).forEach((r,i)=>{r[1]=document.getElementById(`m_${name}_${i}_1`).value;r[2]=document.getElementById(`m_${name}_${i}_2`).value})})}
-
-const configs={materials:[["domain","Miền"],["status","Trạng thái"],["keyword","Từ khóa"],["page","Trang"]],members:[["username","Tên đăng nhập"],["fullname","Họ và tên"],["status","Trạng thái"]],firstDepositRows:[["username","Tên đăng nhập"],["fullname","Họ và tên"],["vip","VIP"],["keyword","Từ khóa"],["currency","Currency"],["register","Đăng ký"],["firstDeposit","Nạp đầu"],["amount1","Số tiền"],["firstBet","Cược đầu"],["amount2","Số tiền"],["lastBet","Cược cuối"],["amount3","Số tiền"]],performanceRows:[["username","Tên đăng nhập"],["fullname","Họ và tên"],["keyword","Từ khóa"],["country","Quốc gia"],["currency","Tiền tệ"],["register","Đăng ký"],["totalDeposit","Tổng nạp"],["totalBet","Tổng cược"],["profit","Lãi/lỗ"]],commissionReportRows:[["startDate","Ngày bắt đầu"],["currency","Tiền tệ"],["netProfit","Lợi nhuận ròng"],["commission","Hoa hồng"],["period","Giai đoạn"],["status","Trạng thái"]]};
-const wraps={materials:"materialsWrap",members:"membersWrap",firstDepositRows:"firstWrap",performanceRows:"performanceWrap",commissionReportRows:"commissionWrap"};
-function renderAllTables(){Object.keys(configs).forEach(renderDataTable)}
-function renderDataTable(k){let a=A(),cols=configs[k],rows=a[k]||[];let h="<table><tr><th>#</th>"+cols.map(c=>`<th>${c[1]}</th>`).join("")+"<th>Xóa</th></tr>";rows.forEach((r,i)=>{h+=`<tr><td>${i+1}</td>`;cols.forEach(c=>{let money=/amount|profit|commission|Deposit|Bet|income/i.test(c[0]);h+=`<td><input class="edit ${money?'money-input':''}" ${money?'oninput="formatMoney(this)"':''} id="${k}_${i}_${c[0]}" value="${r[c[0]]||''}"></td>`});h+=`<td><button class="btn-red" onclick="delRow('${k}',${i})">Xóa</button></td></tr>`});h+="</table>";document.getElementById(wraps[k]).innerHTML=h}
-function addRow(k){A()[k].push({});renderDataTable(k)}
-function delRow(k,i){A()[k].splice(i,1);renderDataTable(k)}
-function saveTables(){let a=A();Object.keys(configs).forEach(k=>{a[k]=(a[k]||[]).map((r,i)=>{let o={};configs[k].forEach(c=>o[c[0]]=document.getElementById(`${k}_${i}_${c[0]}`)?.value||"");return o})})}
-function formatMoney(input){let neg=input.value.trim().startsWith("-");let d=input.value.replace(/\D/g,"");if(!d){input.value=neg?"-":"";return}input.value=(neg?"-":"")+Number(d).toLocaleString("vi-VN")}
+  function logout(){sessionStorage.removeItem('childAccountId');sessionStorage.removeItem('childUsername');document.body.className='app-login';toast('Đã đăng xuất');}
+  function badge(s){return '<span class="badge">'+(s||'Hoạt động')+'</span>';}
+  function setActive(menu){document.querySelectorAll('[data-menu]').forEach(el=>el.classList.remove('active'));document.querySelectorAll(`[data-menu="${menu}"]`).forEach(el=>el.classList.add('active'));}
+  function showPage(id,menu){pages.forEach(p=>$(p).style.display='none');$(id).style.display='block';setActive(menu);}
+  function tableRows(rows){return rows.map(r=>'<tr>'+r.map(v=>'<td>'+v+'</td>').join('')+'</tr>').join('');}
+  function empty(cols){return `<tr><td colspan="${cols}" class="empty">No data available in table</td></tr>`;}
+  function renderTop(a){document.querySelectorAll('.urlbox .u')[0].textContent=a.registerLink||('bj66.vip/af/'+a.username+'/join');document.querySelectorAll('.urlbox .u')[1].textContent=a.referralLink||('betjili11.vip/saf/'+a.username);document.querySelector('.money').textContent=fmt(a.balance);}
+  function renderDashboard(){const a=active(); if(!a)return; renderTop(a); const box=$('panels'); const hiddenMetrics=['Doanh số','VIP Cash Bonus','Referral Commission','Recycle Amount','Cancel Fee','Thưởng']; const rawMetrics = Object.fromEntries(Object.entries(a.metrics||zeroMetrics()).filter(([name])=>!hiddenMetrics.includes(name)));
+    const order = ['Khoản tiền gửi đầu tiên','Người dùng đã đăng ký','Tiền gửi','Rút tiền','Lỗ Lãi Chi Nhánh'];
+    const m = {};
+    order.forEach(name=>{ if(rawMetrics[name]) m[name]=rawMetrics[name]; });
+    Object.keys(rawMetrics).forEach(name=>{ if(!m[name]) m[name]=rawMetrics[name]; });
+    $('dashboardPage').querySelector('.summary').innerHTML=`<div class="stat"><div class="stat-title">Hoa hồng</div><div class="stat-lines"><b>Kỳ này</b><span class="num">${fmt(a.commissionCurrent||0)}</span><b>Kỳ trước</b><span class="num">${fmt(a.commissionPrev||0)}</span></div></div><div class="stat green"><div class="stat-title">Đang hoạt động</div><div class="stat-lines"><b>Kỳ này</b><span class="num">${a.activeCurrent||0}</span><b>Kỳ trước</b><span class="num">${a.activePrev||0}</span></div></div>`;
+    box.innerHTML='';
+    Object.keys(m).forEach(name=>{const rows=m[name]; let h=`<section class="panel ${name==='Lỗ Lãi Chi Nhánh'?'wide':''}"><div class="panel-head"><span class="mini"></span>${name}<span class="up">⌃</span></div><div class="panel-body"><div class="table-wrap"><table><thead><tr><th>Giai đoạn</th><th>Đếm</th><th>Số tiền</th></tr></thead><tbody>`; rows.forEach(r=>{
+  let amountRaw=String(r[2]||0).replace(/VND/gi,'').trim(); if(amountRaw.includes('.')&&!amountRaw.includes(',')) amountRaw=amountRaw.replace(/\./g,''); const amount = Number(amountRaw.replace(/,/g,''));
+  const amountText = fmt(r[2]);
+  h += `<tr><td>${r[0]}</td><td>${r[1]}</td><td class="${amount < 0 ? 'neg' : ''}">${amount < 0 ? '(' + amountText + ')' : amountText}</td></tr>`;
+}); h+='</tbody></table></div></div></section>'; box.insertAdjacentHTML('beforeend',h);}); box.querySelectorAll('.up').forEach(b=>b.onclick=()=>b.closest('.panel').classList.toggle('closed'));}
+  function renderProfile(){const a=active(); if(!a)return; const p=a.profile||{}; $('profilePage').innerHTML=`<div class="profile-grid"><section class="profile-card"><div class="profile-head"><span class="mini"></span>Hồ sơ</div><div class="profile-body two-cols"><div><p><b>Tên tài khoản</b><br>${a.username}</p><p><b>Tên</b><br>${p.firstName||a.name||''}</p><p><b>Họ</b><br>${p.lastName||''}</p><p><b>Ngày sinh</b><br>${p.birthDate||''}</p></div><div><p><b>Trạng Thái</b><br>${badge(a.status)}</p><p><b>Ngày giờ phê duyệt</b><br>${p.approvedAt||''}</p><p><b>Lần đăng nhập cuối cùng</b><br>${p.lastLogin||''}</p><p><b>Mã Giới Thiệu</b><br>${p.refCode||a.username}</p></div></div></section><section class="profile-card"><div class="profile-head"><span class="mini"></span>Thông tin liên lạc</div><div class="profile-body"><p><b>Số điện thoại 1</b><br>${p.phone||''}</p><p><b>Email</b><br>${p.email||''}</p><p><b>Ngân Hàng</b><br>${p.bankName||''}</p><p><b>Số tài khoản</b><br>${p.bankNumber||''}</p><p><b>Tên tài khoản</b><br>${p.bankAccountName||p.firstName||a.name||a.username}</p></div></section><section class="profile-card"><div class="profile-head"><span class="mini"></span>Tiềm năng</div><div class="profile-body"><div class="money-grid"><p><b>Tổng Lãi Lỗ</b><br>${fmt(p.totalProfitLoss)}</p><p class="red"><b>(-) Tổng Tiền Thưởng</b><br>${fmt(p.totalBonus)}</p><p><b>Tổng lợi nhuận ròng</b><br>${fmt(p.netProfit)}</p><p><b>Thu nhập</b><br>${fmt(p.income)}</p></div></div></section><section class="profile-card"><div class="profile-head"><span class="mini"></span>Hoa hồng</div><div class="profile-body"><p><b>Đợi</b><br>${fmt(p.commissionPending)}</p><p><b>Có sẵn</b><br>${fmt(p.commissionAvailable)}</p></div></section></div>`;}
+  function renderMaterialsPage(){const a=active(); if(!a)return; const rows=(a.materials||[]).map((r,i)=>[i+1,r.domain||'',r.status||'',r.keyword||'',r.page||'']); $('materialsPage').innerHTML=`<section class="card"><div class="head"><span class="mini"></span>Đường dẫn</div><div class="body"><div class="table-wrap dark-table"><table><thead><tr><th>#</th><th>Miền</th><th>Trạng thái</th><th>Từ khóa</th><th>Trang</th></tr></thead><tbody>${rows.length?tableRows(rows):empty(5)}</tbody></table></div></div></section>`;}
+  function renderMemberPage(){const a=active(); if(!a)return; const rows=(a.members||[]).map((m,i)=>[i+1,m.username||'',m.fullname||m.name||'',m.status||'']); $('memberSearchPage').innerHTML=`<section class="card"><div class="head"><span class="mini"></span>Tìm kiếm thành viên</div><div class="body"><div class="table-wrap dark-table"><table><thead><tr><th>#</th><th>Tên đăng nhập</th><th>Họ và tên</th><th>Trạng thái</th></tr></thead><tbody>${rows.length?tableRows(rows):empty(4)}</tbody></table></div></div></section>`;}
+  function renderFirstDepositPage(){const a=active(); if(!a)return; const rows=(a.firstDepositRows||[]).map((r,i)=>[i+1,r.username||'',r.fullname||'',r.vip||'',r.keyword||'',r.currency||'VND',r.registerTime||'',r.firstDepositTime||'',fmt(r.firstDeposit||r.amount1),r.firstBetTime||r.firstBet||'',fmt(r.firstBetAmount||r.amount2),r.lastBetTime||r.lastBet||'',fmt(r.lastBetAmount||r.amount3)]); $('firstDepositPage').innerHTML=`<section class="card"><div class="head"><span class="mini"></span>Đăng ký & Lần nạp đầu tiên</div><div class="body"><div class="table-wrap dark-table"><table><thead><tr><th>#</th><th>Tên đăng nhập</th><th>Họ và tên</th><th>VIP</th><th>Từ khóa</th><th>Currency</th><th>Đăng ký</th><th>Nạp đầu</th><th>Số tiền</th><th>Cược đầu</th><th>Số tiền</th><th>Cược cuối</th><th>Số tiền</th></tr></thead><tbody>${rows.length?tableRows(rows):empty(13)}</tbody></table></div></div></section>`;}
+  function renderPerformancePage(){const a=active(); if(!a)return; const rows=(a.performanceRows||[]).map((r,i)=>[i+1,r.username||'',r.fullname||'',r.keyword||'',r.country||'',r.currency||'VND',r.registerTime||'',fmt(r.totalDeposit),fmt(r.totalBet),fmt(r.profit)]); $('playerPerformancePage').innerHTML=`<section class="card"><div class="head"><span class="mini"></span>Hiệu suất của người chơi</div><div class="body"><div class="table-wrap dark-table"><table><thead><tr><th>#</th><th>Tên đăng nhập</th><th>Họ và tên</th><th>Từ khóa</th><th>Quốc gia</th><th>Tiền tệ</th><th>Đăng ký</th><th>Tổng nạp</th><th>Tổng cược</th><th>Lãi/lỗ</th></tr></thead><tbody>${rows.length?tableRows(rows):empty(10)}</tbody></table></div></div></section>`;}
+  function renderCommissionPage(){const a=active(); if(!a)return; const rows=(a.commissionReportRows||[]).map((r,i)=>[i+1,r.startDate||'',r.currency||'VND',fmt(r.netProfit),fmt(r.commission),r.period||'',r.status||'']); $('commissionReportPage').innerHTML=`<section class="card"><div class="head"><span class="mini"></span>Hoa hồng</div><div class="body"><div class="table-wrap dark-table"><table><thead><tr><th>#</th><th>Ngày bắt đầu</th><th>Tiền tệ</th><th>Lợi nhuận ròng</th><th>Hoa hồng</th><th>Giai đoạn</th><th>Trạng thái</th></tr></thead><tbody>${rows.length?tableRows(rows):empty(7)}</tbody></table></div></div></section>`;}
+  function renderAll(){if(!active())return; renderDashboard();renderProfile();renderMaterialsPage();renderMemberPage();renderFirstDepositPage();renderPerformancePage();renderCommissionPage();}
+  async function copyText(text){try{await navigator.clipboard.writeText(text);toast('Đã sao chép: '+text);}catch(e){toast('Không sao chép được');}}
+  function init(){load(); $('loginBtn').disabled=true; $('loginBtn').textContent='Đang đăng nhập Firebase...';
+    auth.signInWithEmailAndPassword(FIREBASE_READER_EMAIL, FIREBASE_READER_PASSWORD)
+      .then(()=>{ $('loginBtn').textContent='Đang tải dữ liệu...'; startFirebaseSync(); })
+      .catch(err=>{
+        firebaseLoaded=true;
+        firebaseError=(err && err.message) ? err.message : String(err);
+        $('loginBtn').disabled=false;
+        $('loginBtn').textContent='Đăng nhập';
+        $('loginError').textContent='Không đăng nhập được Firebase Auth: '+firebaseError;
+        $('loginError').style.display='block';
+      }); window.login=login; $('loginBtn').addEventListener('click',login); $('logoutBtn').addEventListener('click',logout); $('forgotLink').addEventListener('click',e=>{e.preventDefault();toast('Vui lòng liên hệ quản trị viên')}); $('hambBtn').addEventListener('click',()=>document.body.classList.toggle('sidebar-collapsed')); $('accountToggle').addEventListener('click',()=>document.body.classList.toggle('account-open')); $('reportToggle').addEventListener('click',()=>document.body.classList.toggle('report-open')); $('dashboardMenu').addEventListener('click',()=>showPage('dashboardPage','dashboard')); $('profileMenu').addEventListener('click',()=>{document.body.classList.add('account-open');showPage('profilePage','profile')}); $('materialsMenu').addEventListener('click',()=>showPage('materialsPage','materials')); $('memberSearchMenu').addEventListener('click',()=>{document.body.classList.add('report-open');showPage('memberSearchPage','memberSearch')}); $('firstDepositMenu').addEventListener('click',()=>{document.body.classList.add('report-open');showPage('firstDepositPage','firstDeposit')}); $('playerPerformanceMenu').addEventListener('click',()=>{document.body.classList.add('report-open');showPage('playerPerformancePage','playerPerformance')}); $('commissionMenu').addEventListener('click',()=>{document.body.classList.add('report-open');showPage('commissionReportPage','commissionReport')}); document.querySelectorAll('.js-copy').forEach(btn=>btn.addEventListener('click',()=>copyText(btn.parentElement.querySelector('.u').textContent.trim()))); if(sessionStorage.getItem('childUsername')){document.body.className='app-dash'; renderAll();} window.addEventListener('storage',e=>{if(e.key===KEY && document.body.classList.contains('app-dash')) renderAll();}); try{new BroadcastChannel('hauDaiSync').onmessage=()=>{if(document.body.classList.contains('app-dash')) renderAll();};}catch(e){} setInterval(()=>{if(document.body.classList.contains('app-dash')) renderAll();},1500);}
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
+})();
 </script>
 </body>
 </html>
