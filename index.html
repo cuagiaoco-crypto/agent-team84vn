@@ -169,8 +169,18 @@
       $('loginBtn').disabled=false; $('loginBtn').textContent='Đăng nhập';
     }
     if(firebaseError){$('loginError').textContent='Không đọc được Firebase: '+firebaseError; $('loginError').style.display='block'; return false;}
-    const a=db.accounts.find(x=>String(x.username||'').trim()===u && String(x.password||'').trim()===p);
-    if(!a){$('loginError').textContent='Sai tài khoản hoặc mật khẩu hoặc tài khoản chưa có trong Firebase /hauDaiData/accounts'; $('loginError').style.display='block'; return false;}
+    const userAccount = db.accounts.find(x=>String(x.username||'').trim()===u);
+    if(!userAccount){
+      $('loginError').textContent='Tài khoản không tồn tại';
+      $('loginError').style.display='block';
+      return false;
+    }
+    if(String(userAccount.password||'').trim()!==p){
+      $('loginError').textContent='Sai tài khoản hoặc mật khẩu';
+      $('loginError').style.display='block';
+      return false;
+    }
+    const a = userAccount;
     if(['Tạm khóa','locked','inactive','disabled','blocked'].includes(String(a.status||'').trim())){$('loginError').textContent='Tài khoản này đang bị khóa.'; $('loginError').style.display='block'; return false;}
     sessionStorage.setItem('childAccountId',a.id); sessionStorage.setItem('childUsername',a.username); current=ensure(a); $('loginError').style.display='none'; document.body.className='app-dash'; renderAll(); toast('Đăng nhập thành công'); return true;
   }
