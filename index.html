@@ -159,63 +159,120 @@
 .qr-card button{height:32px;padding:0 14px;border:0;border-radius:3px;background:#3f4a60;color:#fff;font-weight:700}
 
 
-/* V14 fixed QR top center */
-.topbar{height:46px}
-.v14-qr-wrap{
-  position:absolute;
-  left:50%;
-  top:54px;
-  transform:translateX(-50%);
-  z-index:8;
-  width:180px;
+/* V14 CLEAN QR/LINK UI - code layout fix */
+.topbar{
+  height:46px!important;
+  left:0;right:0;
+}
+.top-section.left,.top-section.mid{
+  display:none!important;
+}
+.topbar .logout{margin-left:auto}
+.content{
+  padding-top:74px!important;
+}
+.v14-link-qr-row{
+  display:grid;
+  grid-template-columns:1fr 260px 1fr;
+  gap:16px;
+  margin:0 0 16px;
+  align-items:stretch;
+}
+.v14-link-card,.v14-qr-card{
   background:#fff;
-  border:1px solid #d8dde5;
-  border-radius:5px;
-  box-shadow:0 2px 7px rgba(0,0,0,.16);
-  padding:8px;
+  border-radius:6px;
+  box-shadow:0 2px 6px rgba(0,0,0,.16);
+  border:1px solid #dfe4ea;
+  padding:16px;
+  min-height:176px;
+}
+.v14-link-card.register{
+  background:linear-gradient(135deg,#f7fbff,#eef5ff);
+}
+.v14-link-card.referral{
+  background:linear-gradient(135deg,#f8fff9,#eefaf0);
+}
+.v14-link-title{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  font-size:16px;
+  font-weight:800;
+  color:#184b91;
+  margin-bottom:18px;
+}
+.v14-link-card.referral .v14-link-title{color:#15803d}
+.v14-link-input{
+  width:100%;
+  min-height:42px;
+  border:1px solid #cfd7e3;
+  border-radius:4px;
+  background:#fff;
+  padding:11px 12px;
+  font-size:15px;
+  font-weight:700;
+  color:#18304f;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+.v14-link-actions{
+  display:flex;
+  gap:10px;
+  margin-top:16px;
+  flex-wrap:wrap;
+}
+.v14-btn{
+  height:38px;
+  border:0;
+  border-radius:4px;
+  padding:0 14px;
+  color:#fff;
+  font-weight:800;
+  background:#1d5fd1;
+}
+.v14-btn.green{background:#159447}
+.v14-btn.light{
+  background:#fff;
+  color:#18304f;
+  border:1px solid #cfd7e3;
+}
+.v14-qr-card{
   text-align:center;
+  background:#fff;
 }
 .v14-qr-title{
-  font-weight:700;
-  font-size:12px;
+  font-size:15px;
+  font-weight:800;
+  margin-bottom:10px;
   color:#142235;
-  margin-bottom:5px;
 }
 .v14-qr-img{
-  width:108px;
-  height:108px;
+  width:128px;
+  height:128px;
   object-fit:contain;
-  display:block;
-  margin:0 auto 6px;
-  border:1px solid #e0e0e0;
+  border:1px solid #d6dce5;
   background:#fff;
+  display:block;
+  margin:0 auto 12px;
 }
 .v14-qr-actions{
   display:flex;
-  gap:5px;
   justify-content:center;
+  gap:8px;
 }
-.v14-qr-actions button{
-  height:25px;
-  padding:0 7px;
-  border:0;
-  border-radius:3px;
-  background:#3f4a60;
-  color:#fff;
-  font-size:11px;
-  font-weight:700;
+.v14-qr-actions .v14-btn{
+  height:34px;
+  font-size:12px;
+  padding:0 10px;
 }
-.v14-qr-actions button:nth-child(2){background:#1b8f3a}
-.urlbox .copy-link-btn{
-  width:auto!important;
-  min-width:48px;
-  padding:0 8px;
-  font-size:11px;
+.qr-modal{display:none!important}
+@media(max-width:1050px){
+  .v14-link-qr-row{grid-template-columns:1fr}
+  .v14-qr-card{order:3}
 }
-.content{padding-top:112px}
-@media(max-width:900px){
-  .v14-qr-wrap{position:relative;left:auto;top:auto;transform:none;width:calc(100% - 16px);margin:8px auto}
-  .content{padding-top:150px}
+@media(max-width:760px){
+  .content{padding-top:136px!important}
 }
 
 </style>
@@ -252,9 +309,8 @@
 </section>
 <section class="app">
 <div class="topbar">
-<div class="top-section left"><span class="top-label">Liên kết Đăng ký Người chơi Mặc định</span><div class="urlbox"><span class="ico">🔗</span><span class="u">bj66.vip/af/ZxA3mbxl/join</span><button class="copy js-copy copy-link-btn" type="button">Copy</button></div></div>
-<div class="top-section mid"><span class="top-label">Liên kết Giới thiệu Liên kết</span><div class="urlbox"><span class="ico">🔗</span><span class="u">betjili11.vip/saf/ZxA3mbxl</span><button class="copy js-copy copy-link-btn" type="button">Copy</button></div></div>
-<div class="v14-qr-wrap" id="v14QrWrap"><div class="v14-qr-title">Mã QR giới thiệu</div><img class="v14-qr-img" id="v14QrImg" alt="QR"><div class="v14-qr-actions"><button type="button" id="copyQrBtn">Sao chép QR</button><button type="button" id="downloadQrBtn">Tải QR</button></div></div><div class="money">₫ 0.00</div><div class="logout" id="logoutBtn">↪</div>
+  <div class="money">₫ 0.00</div>
+  <div class="logout" id="logoutBtn">↪</div>
 </div>
 <aside class="sidebar">
 <div class="welcome"><span>Welcome</span><span class="hamb" id="hambBtn">≡</span></div>
@@ -266,7 +322,34 @@
 <div class="submenu report-sub"><div class="submenu-item" data-menu="memberSearch" id="memberSearchMenu">Tìm kiếm thành viên</div><div class="submenu-item" data-menu="firstDeposit" id="firstDepositMenu">Đăng ký &amp; Lần nạp đầu tiên</div><div class="submenu-item" data-menu="playerPerformance" id="playerPerformanceMenu">Hiệu suất của người chơi</div><div class="submenu-item" data-menu="commissionReport" id="commissionMenu">Hoa hồng</div></div>
 </aside>
 <main class="content">
-<div id="dashboardPage"><select class="currency"><option>VND</option></select><div class="summary"><div class="stat"><div class="stat-title">Hoa hồng</div><div class="stat-lines"><b>Kỳ này</b><span class="num">₫328.49</span><b>Kỳ trước</b><span class="num">₫0</span></div></div><div class="stat green"><div class="stat-title">Đang hoạt động</div><div class="stat-lines"><b>Kỳ này</b><span class="num">37</span><b>Kỳ trước</b><span class="num">56</span></div></div></div><div class="grid" id="panels"></div></div>
+<div id="dashboardPage">
+<div class="v14-link-qr-row" id="v14LinkQrRow">
+  <section class="v14-link-card register">
+    <div class="v14-link-title">🔗 LINK ĐĂNG KÝ</div>
+    <div class="v14-link-input" id="v14RegisterLink">...</div>
+    <div class="v14-link-actions">
+      <button class="v14-btn" type="button" id="copyRegisterBtn">📋 Sao chép Link</button>
+      <button class="v14-btn light" type="button" id="openRegisterBtn">↗ Mở link</button>
+    </div>
+  </section>
+  <section class="v14-qr-card">
+    <div class="v14-qr-title">MÃ QR GIỚI THIỆU</div>
+    <img class="v14-qr-img" id="v14QrImg" alt="QR">
+    <div class="v14-qr-actions">
+      <button class="v14-btn green" type="button" id="copyQrBtn">📋 Sao chép QR</button>
+      <button class="v14-btn" type="button" id="downloadQrBtn">⬇ Tải QR</button>
+    </div>
+  </section>
+  <section class="v14-link-card referral">
+    <div class="v14-link-title">👥 LINK GIỚI THIỆU</div>
+    <div class="v14-link-input" id="v14ReferralLink">...</div>
+    <div class="v14-link-actions">
+      <button class="v14-btn green" type="button" id="copyReferralBtn">📋 Sao chép Link</button>
+      <button class="v14-btn light" type="button" id="openReferralBtn">↗ Mở link</button>
+    </div>
+  </section>
+</div>
+<select class="currency"><option>VND</option></select><div class="summary"><div class="stat"><div class="stat-title">Hoa hồng</div><div class="stat-lines"><b>Kỳ này</b><span class="num">₫328.49</span><b>Kỳ trước</b><span class="num">₫0</span></div></div><div class="stat green"><div class="stat-title">Đang hoạt động</div><div class="stat-lines"><b>Kỳ này</b><span class="num">37</span><b>Kỳ trước</b><span class="num">56</span></div></div></div><div class="grid" id="panels"></div></div>
 <div id="profilePage" style="display:none"></div>
 <div id="loginHistoryPage" style="display:none"></div>
 <div id="materialsPage" style="display:none"></div>
@@ -532,54 +615,47 @@
   function tableRows(rows){return rows.map(r=>'<tr>'+r.map(v=>'<td>'+v+'</td>').join('')+'</tr>').join('');}
   function empty(cols){return `<tr><td colspan="${cols}" class="empty">No data available in table</td></tr>`;}
 
-  function getReferralQrText(){
+  function getLinks(){
     const a=active();
-    if(!a) return '';
-    return a.referralLink || ('betjili11.vip/saf/'+a.username);
+    if(!a) return {reg:'', ref:''};
+    return {
+      reg: a.registerLink || ('bj66.vip/af/'+a.username+'/join'),
+      ref: a.referralLink || ('betjili11.vip/saf/'+a.username)
+    };
   }
-
-  function qrUrl(text, size=260){
+  function qrUrl(text, size=520){
     return 'https://api.qrserver.com/v1/create-qr-code/?size='+size+'x'+size+'&data='+encodeURIComponent(text||'');
   }
-
-  function updateFixedQR(){
+  function updateV14TopUI(){
     const a=active();
-    const img=$('v14QrImg');
-    if(!a || !img) return;
-    const link=getReferralQrText();
-    img.src=qrUrl(link, 260);
-    img.dataset.qrText=link;
+    if(!a) return;
+    const links=getLinks();
+    if($('v14RegisterLink')) $('v14RegisterLink').textContent=links.reg;
+    if($('v14ReferralLink')) $('v14ReferralLink').textContent=links.ref;
+    if($('v14QrImg')) $('v14QrImg').src=qrUrl(links.ref,520);
   }
-
-  async function copyCurrentLink(){
-    const link=getReferralQrText();
-    await copyText(link);
-  }
-
   async function copyQrImage(){
-    const link=getReferralQrText();
+    const links=getLinks();
     try{
-      const res=await fetch(qrUrl(link, 512));
+      const res=await fetch(qrUrl(links.ref,800));
       const blob=await res.blob();
       if(navigator.clipboard && window.ClipboardItem){
-        await navigator.clipboard.write([new ClipboardItem({'image/png': blob})]);
+        await navigator.clipboard.write([new ClipboardItem({'image/png':blob})]);
         toast('Đã sao chép QR');
       }else{
-        await copyText(link);
+        await copyText(links.ref);
         toast('Trình duyệt không hỗ trợ sao chép ảnh, đã sao chép link');
       }
     }catch(e){
       console.error(e);
-      await copyText(link);
-      toast('Không sao chép được ảnh QR, đã sao chép link');
+      await copyText(links.ref);
+      toast('Không sao chép được QR, đã sao chép link');
     }
   }
-
   async function downloadQrImage(){
-    const a=active();
-    const link=getReferralQrText();
+    const a=active(), links=getLinks();
     try{
-      const res=await fetch(qrUrl(link, 800));
+      const res=await fetch(qrUrl(links.ref,1000));
       const blob=await res.blob();
       const url=URL.createObjectURL(blob);
       const down=document.createElement('a');
@@ -591,19 +667,13 @@
       URL.revokeObjectURL(url);
       toast('Đã tải QR');
     }catch(e){
-      console.error(e);
-      window.open(qrUrl(link,800),'_blank');
+      window.open(qrUrl(links.ref,1000),'_blank');
     }
   }
 
   function renderTop(a){
-    const reg=a.registerLink||('bj66.vip/af/'+a.username+'/join');
-    const ref=a.referralLink||('betjili11.vip/saf/'+a.username);
-    const boxes=document.querySelectorAll('.urlbox');
-    if(boxes[0]) boxes[0].querySelector('.u').textContent=reg;
-    if(boxes[1]) boxes[1].querySelector('.u').textContent=ref;
     document.querySelector('.money').textContent=fmt(a.balance);
-    updateFixedQR();
+    updateV14TopUI();
   }
   function renderDashboard(){const a=active(); if(!a)return; renderTop(a); const box=$('panels'); const hiddenMetrics=['Doanh số','VIP Cash Bonus','Referral Commission','Recycle Amount','Cancel Fee','Thưởng']; const rawMetrics = Object.fromEntries(Object.entries(a.metrics||zeroMetrics()).filter(([name])=>!hiddenMetrics.includes(name)));
     const order = ['Khoản tiền gửi đầu tiên','Người dùng đã đăng ký','Tiền gửi','Rút tiền','Lỗ Lãi Chi Nhánh'];
@@ -623,7 +693,7 @@
   function renderFirstDepositPage(){const a=active(); if(!a)return; const rows=(a.firstDepositRows||[]).map((r,i)=>[i+1,r.username||'',r.fullname||'',r.vip||'',r.keyword||'',r.currency||'VND',r.registerTime||'',r.firstDepositTime||'',fmt(r.firstDeposit||r.amount1),r.firstBetTime||r.firstBet||'',fmt(r.firstBetAmount||r.amount2),r.lastBetTime||r.lastBet||'',fmt(r.lastBetAmount||r.amount3)]); $('firstDepositPage').innerHTML=`<section class="card"><div class="head"><span class="mini"></span>Đăng ký & Lần nạp đầu tiên</div><div class="body"><div class="table-wrap dark-table"><table><thead><tr><th>#</th><th>Tên đăng nhập</th><th>Họ và tên</th><th>VIP</th><th>Từ khóa</th><th>Currency</th><th>Đăng ký</th><th>Nạp đầu</th><th>Số tiền</th><th>Cược đầu</th><th>Số tiền</th><th>Cược cuối</th><th>Số tiền</th></tr></thead><tbody>${rows.length?tableRows(rows):empty(13)}</tbody></table></div></div></section>`;}
   function renderPerformancePage(){const a=active(); if(!a)return; const rows=(a.performanceRows||[]).map((r,i)=>[i+1,r.username||'',r.fullname||'',r.keyword||'',r.country||'',r.currency||'VND',r.registerTime||'',fmt(r.totalDeposit),fmt(r.totalBet),fmt(r.profit)]); $('playerPerformancePage').innerHTML=`<section class="card"><div class="head"><span class="mini"></span>Hiệu suất của người chơi</div><div class="body"><div class="table-wrap dark-table"><table><thead><tr><th>#</th><th>Tên đăng nhập</th><th>Họ và tên</th><th>Từ khóa</th><th>Quốc gia</th><th>Tiền tệ</th><th>Đăng ký</th><th>Tổng nạp</th><th>Tổng cược</th><th>Lãi/lỗ</th></tr></thead><tbody>${rows.length?tableRows(rows):empty(10)}</tbody></table></div></div></section>`;}
   function renderCommissionPage(){const a=active(); if(!a)return; const rows=(a.commissionReportRows||[]).map((r,i)=>[i+1,r.startDate||'',r.currency||'VND',fmt(r.netProfit),fmt(r.commission),r.period||'',r.status||'']); $('commissionReportPage').innerHTML=`<section class="card"><div class="head"><span class="mini"></span>Hoa hồng</div><div class="body"><div class="table-wrap dark-table"><table><thead><tr><th>#</th><th>Ngày bắt đầu</th><th>Tiền tệ</th><th>Lợi nhuận ròng</th><th>Hoa hồng</th><th>Giai đoạn</th><th>Trạng thái</th></tr></thead><tbody>${rows.length?tableRows(rows):empty(7)}</tbody></table></div></div></section>`;}
-  function renderAll(){if(!active())return; renderDashboard();renderProfile();renderLoginHistoryPage();renderMaterialsPage();renderMemberPage();renderFirstDepositPage();renderPerformancePage();renderCommissionPage();updateFixedQR();}
+  function renderAll(){if(!active())return; renderDashboard();renderProfile();renderLoginHistoryPage();renderMaterialsPage();renderMemberPage();renderFirstDepositPage();renderPerformancePage();renderCommissionPage();updateV14TopUI();}
   async function copyText(text){try{await navigator.clipboard.writeText(text);toast('Đã sao chép: '+text);}catch(e){toast('Không sao chép được');}}
 
   const AUTO_LOGOUT_MS = 30*60*1000;
@@ -644,7 +714,10 @@
         $('loginBtn').textContent='Đăng nhập';
         $('loginError').textContent='Không đăng nhập được Firebase Auth: '+firebaseError;
         $('loginError').style.display='block';
-      }); window.login=login; $('loginBtn').addEventListener('click',login); $('logoutBtn').addEventListener('click',logout); $('forgotLink').addEventListener('click',e=>{e.preventDefault();toast('Vui lòng liên hệ quản trị viên')}); $('hambBtn').addEventListener('click',()=>document.body.classList.toggle('sidebar-collapsed')); $('accountToggle').addEventListener('click',()=>document.body.classList.toggle('account-open')); $('reportToggle').addEventListener('click',()=>document.body.classList.toggle('report-open')); $('dashboardMenu').addEventListener('click',()=>showPage('dashboardPage','dashboard')); $('profileMenu').addEventListener('click',()=>{document.body.classList.add('account-open');showPage('profilePage','profile')}); $('loginHistoryMenu').addEventListener('click',()=>{document.body.classList.add('account-open');renderLoginHistoryPage();showPage('loginHistoryPage','loginHistory')}); $('materialsMenu').addEventListener('click',()=>showPage('materialsPage','materials')); $('memberSearchMenu').addEventListener('click',()=>{document.body.classList.add('report-open');showPage('memberSearchPage','memberSearch')}); $('firstDepositMenu').addEventListener('click',()=>{document.body.classList.add('report-open');showPage('firstDepositPage','firstDeposit')}); $('playerPerformanceMenu').addEventListener('click',()=>{document.body.classList.add('report-open');showPage('playerPerformancePage','playerPerformance')}); $('commissionMenu').addEventListener('click',()=>{document.body.classList.add('report-open');showPage('commissionReportPage','commissionReport')}); document.querySelectorAll('.js-copy').forEach(btn=>btn.addEventListener('click',()=>copyText(btn.parentElement.querySelector('.u').textContent.trim())));
+      }); window.login=login; $('loginBtn').addEventListener('click',login); $('logoutBtn').addEventListener('click',logout); $('forgotLink').addEventListener('click',e=>{e.preventDefault();toast('Vui lòng liên hệ quản trị viên')}); $('hambBtn').addEventListener('click',()=>document.body.classList.toggle('sidebar-collapsed')); $('accountToggle').addEventListener('click',()=>document.body.classList.toggle('account-open')); $('reportToggle').addEventListener('click',()=>document.body.classList.toggle('report-open')); $('dashboardMenu').addEventListener('click',()=>showPage('dashboardPage','dashboard')); $('profileMenu').addEventListener('click',()=>{document.body.classList.add('account-open');showPage('profilePage','profile')}); $('loginHistoryMenu').addEventListener('click',()=>{document.body.classList.add('account-open');renderLoginHistoryPage();showPage('loginHistoryPage','loginHistory')}); $('materialsMenu').addEventListener('click',()=>showPage('materialsPage','materials')); $('memberSearchMenu').addEventListener('click',()=>{document.body.classList.add('report-open');showPage('memberSearchPage','memberSearch')}); $('firstDepositMenu').addEventListener('click',()=>{document.body.classList.add('report-open');showPage('firstDepositPage','firstDeposit')}); $('playerPerformanceMenu').addEventListener('click',()=>{document.body.classList.add('report-open');showPage('playerPerformancePage','playerPerformance')}); $('commissionMenu').addEventListener('click',()=>{document.body.classList.add('report-open');showPage('commissionReportPage','commissionReport')}); if($('copyRegisterBtn')) $('copyRegisterBtn').addEventListener('click',()=>copyText(getLinks().reg));
+      if($('copyReferralBtn')) $('copyReferralBtn').addEventListener('click',()=>copyText(getLinks().ref));
+      if($('openRegisterBtn')) $('openRegisterBtn').addEventListener('click',()=>window.open(getLinks().reg,'_blank'));
+      if($('openReferralBtn')) $('openReferralBtn').addEventListener('click',()=>window.open(getLinks().ref,'_blank'));
       if($('copyQrBtn')) $('copyQrBtn').addEventListener('click',copyQrImage);
       if($('downloadQrBtn')) $('downloadQrBtn').addEventListener('click',downloadQrImage); if(sessionStorage.getItem('childUsername')){document.body.className='app-dash'; renderAll();} ['click','keydown','mousemove','touchstart'].forEach(ev=>window.addEventListener(ev,resetAutoLogout)); window.addEventListener('storage',e=>{if(e.key===KEY && document.body.classList.contains('app-dash')) renderAll();}); try{new BroadcastChannel('hauDaiSync').onmessage=()=>{if(document.body.classList.contains('app-dash')) renderAll();};}catch(e){} setInterval(()=>{if(document.body.classList.contains('app-dash')) renderAll();},1500);}
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
