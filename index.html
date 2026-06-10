@@ -80,19 +80,47 @@
   };
   if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
   const auth = firebase.auth();
-  /*
-    BẢO MẬT FIREBASE:
-    - Hãy thay FIREBASE_READER_PASSWORD bằng mật khẩu bạn đã tạo cho agentreader@gmail.com trong Firebase Authentication.
-    - Database Rules nên giữ: .read/.write = "auth != null" cho node hauDaiData.
-  */
   const FIREBASE_READER_EMAIL = 'agentreader@gmail.com';
   const FIREBASE_READER_PASSWORD = '735198aa';
-  const dbRef = firebase.database().ref('hauDaiData');
+
+  // Đọc tài khoản do hậu đài tổng tạo tại node /accounts
+  const dbRef = firebase.database().ref('accounts');
   function fmt(n){let v=String(n||0).replace(/VND/gi,'').trim(); if(v.includes('.')&&!v.includes(',')) v=v.replace(/\./g,''); v=v.replace(/,/g,''); return Number(v||0).toLocaleString('vi-VN',{minimumFractionDigits:2,maximumFractionDigits:2})+' VND';}
   function toast(msg){const el=$('toast'); el.textContent=msg; el.classList.add('show'); clearTimeout(toastTimer); toastTimer=setTimeout(()=>el.classList.remove('show'),2200);}
   function normalizeDb(data){
-    data = data || {accounts:[]};
-    if(!Array.isArray(data.accounts)) data.accounts = Object.values(data.accounts || {});
+    data = data || {};
+
+    // Nếu đang đọc trực tiếp node /accounts:
+    // /accounts/pyno111/password => chuyển thành db.accounts[]
+    if(!data.accounts){
+      const accountsObj = data || {};
+      data = {
+        accounts: Object.keys(accountsObj).map(username => {
+          const a = accountsObj[username] || {};
+          return Object.assign({
+            id: username,
+            username: a.username || username,
+            name: a.name || username,
+            password: a.password || '',
+            status: a.status || 'active'
+          }, a);
+        })
+      };
+    }
+
+    if(!Array.isArray(data.accounts)) {
+      data.accounts = Object.keys(data.accounts || {}).map(username => {
+        const a = data.accounts[username] || {};
+        return Object.assign({
+          id: username,
+          username: a.username || username,
+          name: a.name || username,
+          password: a.password || '',
+          status: a.status || 'active'
+        }, a);
+      });
+    }
+
     data.accounts.forEach(a=>{
       if(!Array.isArray(a.members)) a.members = Object.values(a.members || {});
       if(!Array.isArray(a.materials)) a.materials = Object.values(a.materials || {});
@@ -108,15 +136,6 @@
   }
   function load(){try{db=normalizeDb(JSON.parse(localStorage.getItem(KEY))||{accounts:[]});}catch(e){db={accounts:[]};}}
   function saveLocal(){localStorage.setItem(KEY,JSON.stringify(db)); try{new BroadcastChannel('hauDaiSync').postMessage({type:'db-updated'});}catch(e){}}
-  async function ensureFirebaseAuth(){
-    if(FIREBASE_READER_PASSWORD === 'THAY_MAT_KHAU_AGENTREADER_O_DAY'){
-      throw new Error('Chưa điền mật khẩu Firebase Auth cho agentreader@gmail.com trong file index.html');
-    }
-    if(auth.currentUser) return auth.currentUser;
-    await auth.setPersistence(firebase.auth.Auth.Persistence.SESSION);
-    const cred = await auth.signInWithEmailAndPassword(FIREBASE_READER_EMAIL, FIREBASE_READER_PASSWORD);
-    return cred.user;
-  }
   function startFirebaseSync(){
     dbRef.on('value', snap=>{
       firebaseLoaded=true;
@@ -146,14 +165,14 @@
     if(!u || !p){$('loginError').textContent='Vui lòng nhập tên tài khoản và mật khẩu.'; $('loginError').style.display='block'; return false;}
     if(!firebaseLoaded){
       $('loginBtn').disabled=true; $('loginBtn').textContent='Đang tải dữ liệu...';
-      try{await ensureFirebaseAuth(); const snap=await dbRef.once('value'); db=normalizeDb(snap.val()||{accounts:[]}); saveLocal(); firebaseLoaded=true;}
+      try{const snap=await dbRef.once('value'); db=normalizeDb(snap.val()||{accounts:[]}); saveLocal(); firebaseLoaded=true;}
       catch(err){firebaseLoaded=true; firebaseError=(err&&err.message)?err.message:String(err); $('loginBtn').disabled=false; $('loginBtn').textContent='Đăng nhập'; $('loginError').textContent='Không đọc được Firebase: '+firebaseError; $('loginError').style.display='block'; return false;}
       $('loginBtn').disabled=false; $('loginBtn').textContent='Đăng nhập';
     }
     if(firebaseError){$('loginError').textContent='Không đọc được Firebase: '+firebaseError; $('loginError').style.display='block'; return false;}
     const a=db.accounts.find(x=>String(x.username||'').trim()===u && String(x.password||'').trim()===p);
-    if(!a){$('loginError').textContent='Sai tài khoản hoặc mật khẩu hoặc tài khoản chưa có trong Firebase'; $('loginError').style.display='block'; return false;}
-    if(a.status==='Tạm khóa'){$('loginError').textContent='Tài khoản này đang bị khóa.'; $('loginError').style.display='block'; return false;}
+    if(!a){$('loginError').textContent='Sai tài khoản hoặc mật khẩu hoặc tài khoản chưa có trong Firebase /accounts'; $('loginError').style.display='block'; return false;}
+    if(['Tạm khóa','locked','inactive','disabled','blocked'].includes(String(a.status||'').trim())){$('loginError').textContent='Tài khoản này đang bị khóa.'; $('loginError').style.display='block'; return false;}
     sessionStorage.setItem('childAccountId',a.id); sessionStorage.setItem('childUsername',a.username); current=ensure(a); $('loginError').style.display='none'; document.body.className='app-dash'; renderAll(); toast('Đăng nhập thành công'); return true;
   }
   function logout(){sessionStorage.removeItem('childAccountId');sessionStorage.removeItem('childUsername');document.body.className='app-login';toast('Đã đăng xuất');}
@@ -176,7 +195,17 @@
   function renderCommissionPage(){const a=active(); if(!a)return; const rows=(a.commissionReportRows||[]).map((r,i)=>[i+1,r.startDate||'',r.currency||'VND',fmt(r.netProfit),fmt(r.commission),r.period||'',r.status||'']); $('commissionReportPage').innerHTML=`<section class="card"><div class="head"><span class="mini"></span>Hoa hồng</div><div class="body"><div class="table-wrap dark-table"><table><thead><tr><th>#</th><th>Ngày bắt đầu</th><th>Tiền tệ</th><th>Lợi nhuận ròng</th><th>Hoa hồng</th><th>Giai đoạn</th><th>Trạng thái</th></tr></thead><tbody>${rows.length?tableRows(rows):empty(7)}</tbody></table></div></div></section>`;}
   function renderAll(){if(!active())return; renderDashboard();renderProfile();renderMaterialsPage();renderMemberPage();renderFirstDepositPage();renderPerformancePage();renderCommissionPage();}
   async function copyText(text){try{await navigator.clipboard.writeText(text);toast('Đã sao chép: '+text);}catch(e){toast('Không sao chép được');}}
-  function init(){load(); $('loginBtn').disabled=true; $('loginBtn').textContent='Đang xác thực Firebase...'; ensureFirebaseAuth().then(()=>{startFirebaseSync();}).catch(err=>{firebaseLoaded=true; firebaseError=(err&&err.message)?err.message:String(err); console.error('Firebase Auth error:',err); $('loginBtn').disabled=false; $('loginBtn').textContent='Đăng nhập'; $('loginError').textContent='Không đăng nhập được Firebase Auth: '+firebaseError; $('loginError').style.display='block';}); window.login=login; $('loginBtn').addEventListener('click',login); $('logoutBtn').addEventListener('click',logout); $('forgotLink').addEventListener('click',e=>{e.preventDefault();toast('Vui lòng liên hệ quản trị viên')}); $('hambBtn').addEventListener('click',()=>document.body.classList.toggle('sidebar-collapsed')); $('accountToggle').addEventListener('click',()=>document.body.classList.toggle('account-open')); $('reportToggle').addEventListener('click',()=>document.body.classList.toggle('report-open')); $('dashboardMenu').addEventListener('click',()=>showPage('dashboardPage','dashboard')); $('profileMenu').addEventListener('click',()=>{document.body.classList.add('account-open');showPage('profilePage','profile')}); $('materialsMenu').addEventListener('click',()=>showPage('materialsPage','materials')); $('memberSearchMenu').addEventListener('click',()=>{document.body.classList.add('report-open');showPage('memberSearchPage','memberSearch')}); $('firstDepositMenu').addEventListener('click',()=>{document.body.classList.add('report-open');showPage('firstDepositPage','firstDeposit')}); $('playerPerformanceMenu').addEventListener('click',()=>{document.body.classList.add('report-open');showPage('playerPerformancePage','playerPerformance')}); $('commissionMenu').addEventListener('click',()=>{document.body.classList.add('report-open');showPage('commissionReportPage','commissionReport')}); document.querySelectorAll('.js-copy').forEach(btn=>btn.addEventListener('click',()=>copyText(btn.parentElement.querySelector('.u').textContent.trim()))); if(sessionStorage.getItem('childUsername')){document.body.className='app-dash'; renderAll();} window.addEventListener('storage',e=>{if(e.key===KEY && document.body.classList.contains('app-dash')) renderAll();}); try{new BroadcastChannel('hauDaiSync').onmessage=()=>{if(document.body.classList.contains('app-dash')) renderAll();};}catch(e){} setInterval(()=>{if(document.body.classList.contains('app-dash')) renderAll();},1500);}
+  function init(){load(); $('loginBtn').disabled=true; $('loginBtn').textContent='Đang đăng nhập Firebase...';
+    auth.signInWithEmailAndPassword(FIREBASE_READER_EMAIL, FIREBASE_READER_PASSWORD)
+      .then(()=>{ $('loginBtn').textContent='Đang tải dữ liệu...'; startFirebaseSync(); })
+      .catch(err=>{
+        firebaseLoaded=true;
+        firebaseError=(err && err.message) ? err.message : String(err);
+        $('loginBtn').disabled=false;
+        $('loginBtn').textContent='Đăng nhập';
+        $('loginError').textContent='Không đăng nhập được Firebase Auth: '+firebaseError;
+        $('loginError').style.display='block';
+      }); window.login=login; $('loginBtn').addEventListener('click',login); $('logoutBtn').addEventListener('click',logout); $('forgotLink').addEventListener('click',e=>{e.preventDefault();toast('Vui lòng liên hệ quản trị viên')}); $('hambBtn').addEventListener('click',()=>document.body.classList.toggle('sidebar-collapsed')); $('accountToggle').addEventListener('click',()=>document.body.classList.toggle('account-open')); $('reportToggle').addEventListener('click',()=>document.body.classList.toggle('report-open')); $('dashboardMenu').addEventListener('click',()=>showPage('dashboardPage','dashboard')); $('profileMenu').addEventListener('click',()=>{document.body.classList.add('account-open');showPage('profilePage','profile')}); $('materialsMenu').addEventListener('click',()=>showPage('materialsPage','materials')); $('memberSearchMenu').addEventListener('click',()=>{document.body.classList.add('report-open');showPage('memberSearchPage','memberSearch')}); $('firstDepositMenu').addEventListener('click',()=>{document.body.classList.add('report-open');showPage('firstDepositPage','firstDeposit')}); $('playerPerformanceMenu').addEventListener('click',()=>{document.body.classList.add('report-open');showPage('playerPerformancePage','playerPerformance')}); $('commissionMenu').addEventListener('click',()=>{document.body.classList.add('report-open');showPage('commissionReportPage','commissionReport')}); document.querySelectorAll('.js-copy').forEach(btn=>btn.addEventListener('click',()=>copyText(btn.parentElement.querySelector('.u').textContent.trim()))); if(sessionStorage.getItem('childUsername')){document.body.className='app-dash'; renderAll();} window.addEventListener('storage',e=>{if(e.key===KEY && document.body.classList.contains('app-dash')) renderAll();}); try{new BroadcastChannel('hauDaiSync').onmessage=()=>{if(document.body.classList.contains('app-dash')) renderAll();};}catch(e){} setInterval(()=>{if(document.body.classList.contains('app-dash')) renderAll();},1500);}
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
 </script>
