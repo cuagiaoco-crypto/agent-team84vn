@@ -4,7 +4,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Agent Dashboard V14</title>
+<title>Agent Dashboard V14 No Change Password</title>
 <link rel="icon" type="image/svg+xml" href='data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"%3E%3Crect width="64" height="64" rx="12" fill="%23fff4c2"/%3E%3Ccircle cx="32" cy="32" r="23" fill="%23f5b400" stroke="%23d89200" stroke-width="4"/%3E%3Ccircle cx="32" cy="32" r="15" fill="%23ffd85a"/%3E%3Ctext x="32" y="43" font-size="30" text-anchor="middle" font-family="Arial" font-weight="700" fill="%23a66a00"%3E$%3C/text%3E%3C/svg%3E'>
 <style>
     :root{--top:#3f4a60;--top2:#566276;--side:#6f7a8d;--sideDark:#59667b;--bg:#e8edf2;--dark:#3f4a60;--text:#142235}
@@ -150,8 +150,8 @@
 
 .login-history-table{width:100%;min-width:720px}
 .login-history-table th{background:#3f4a60;color:#fff}
-.change-pass-box{margin-top:16px;border-top:1px solid #ddd;padding-top:14px}
-.change-pass-box input{width:100%;height:32px;border:1px solid #c8cdd3;border-radius:3px;padding:4px 9px;margin:5px 0 10px}
+
+
 .change-pass-box button,.qr-btn{height:32px;padding:0 14px;border:0;border-radius:3px;background:#3f4a60;color:#fff;font-weight:700}
 .qr-modal{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:100;display:none;align-items:center;justify-content:center}
 .qr-card{background:#fff;border-radius:8px;padding:18px;width:min(360px,90vw);text-align:center;box-shadow:0 12px 32px rgba(0,0,0,.35)}
@@ -410,29 +410,282 @@
 .gear-menu button.logout-item{color:#c32222}
 
 
-/* Fix change password */
-.change-pass-box input{
-  width:100%;
-  height:34px;
-  border:1px solid #c8cdd3;
-  border-radius:3px;
-  padding:5px 9px;
-  margin:5px 0 12px;
-}
-.change-pass-box button{
-  height:34px;
-  padding:0 16px;
-  border:0;
-  border-radius:3px;
-  background:#1d5fd1;
-  color:#fff;
-  font-weight:700;
-}
-
 </style>
 </head>
 <body class="app-login">
-`;
+<section class="login-page">
+  <div class="mb-login-card">
+    <div class="mb-login-left">
+      <div class="mb-brand">
+        <h1>MB66</h1>
+        <p>Hệ Thống Quản Lý Sale Online</p>
+      </div>
+      <div class="mb-sun"></div>
+      <span class="mb-shape s1"></span>
+      <span class="mb-shape s2"></span>
+      <span class="mb-shape s3"></span>
+      <span class="mb-line l1"></span>
+      <span class="mb-line l2"></span>
+      <span class="mb-line l3"></span>
+      <span class="mb-line l4"></span>
+    </div>
+    <main class="login-card mb-login-right">
+      <header class="login-head"><h1>Đăng Nhập</h1></header>
+      <section class="login-body">
+        <div class="field mb-field"><span class="mb-ico">👤</span><input autocomplete="username" id="username" type="text" placeholder="Xin Vui Lòng Nhập Tài Khoản"/></div>
+        <div class="field mb-field"><span class="mb-ico">🔒</span><input autocomplete="current-password" id="password" type="password" placeholder="Xin Vui Lòng Nhập Mật Khẩu"/><span class="mb-eye">◕</span></div>
+        <button class="btn mb-login-btn" id="loginBtn" type="button">Đăng Nhập</button>
+        <select id="language" class="mb-lang"><option>🇻🇳 Việt Nam</option><option>English</option></select>
+        <div class="login-error" id="loginError">Vui lòng nhập tên tài khoản và mật khẩu.</div>
+      </section>
+      <footer class="login-foot"><div class="login-links"><a class="forgot" href="#" id="forgotLink">Quên mật khẩu</a></div></footer>
+    </main>
+  </div>
+</section>
+<section class="app">
+<div class="topbar">
+  <div class="money">₫ 0.00</div>
+  <div class="gear-wrap"><button class="gear-btn" id="gearBtn" type="button">⚙</button><div class="gear-menu" id="gearMenu"><button type="button" class="logout-item" id="gearLogout">Đăng Xuất</button></div></div>
+</div>
+<aside class="sidebar">
+<div class="welcome"><span>Welcome</span><span class="hamb" id="hambBtn">≡</span></div>
+<div class="menu-item active" data-menu="dashboard" id="dashboardMenu"><svg viewbox="0 0 24 24"><path d="M3 11.5 12 3l9 8.5"></path><path d="M5 10.5V21h5v-6h4v6h5V10.5"></path></svg><span class="menu-text">Bảng điều khiển</span></div>
+<div class="menu-item account-toggle" id="accountToggle"><svg viewbox="0 0 24 24"><circle cx="12" cy="7" r="4"></circle><path d="M4 21c1-5 15-5 16 0"></path></svg><span class="menu-text">Tài khoản của tôi</span><span class="chev">⌃</span></div>
+<div class="submenu account-sub"><div class="submenu-item" data-menu="profile" id="profileMenu">Hồ sơ</div><div class="submenu-item" data-menu="loginHistory" id="loginHistoryMenu">Lịch sử đăng nhập</div></div>
+<div class="menu-item" data-menu="materials" id="materialsMenu"><svg viewbox="0 0 24 24"><circle cx="6" cy="6" r="2"></circle><circle cx="18" cy="6" r="2"></circle><circle cx="6" cy="18" r="2"></circle><circle cx="18" cy="18" r="2"></circle><path d="M8 6h8M6 8v8M18 8v8M8 18h8"></path></svg><span class="menu-text">Nguyên liệu</span></div>
+<div class="menu-item report-toggle" id="reportToggle"><svg viewbox="0 0 24 24"><path d="M4 21V10h4v11M10 21V4h4v17M16 21V8h4v13"></path></svg><span class="menu-text">Báo cáo</span><span class="chev">⌄</span></div>
+<div class="submenu report-sub"><div class="submenu-item" data-menu="memberSearch" id="memberSearchMenu">Tìm kiếm thành viên</div><div class="submenu-item" data-menu="firstDeposit" id="firstDepositMenu">Đăng ký &amp; Lần nạp đầu tiên</div><div class="submenu-item" data-menu="playerPerformance" id="playerPerformanceMenu">Hiệu suất của người chơi</div><div class="submenu-item" data-menu="commissionReport" id="commissionMenu">Hoa hồng</div></div>
+</aside>
+<main class="content">
+<div id="dashboardPage">
+<div class="v14-link-qr-row" id="v14LinkQrRow">
+  <section class="v14-link-card register">
+    <div class="v14-link-title">🔗 LINK ĐĂNG KÝ</div>
+    <div class="v14-link-input" id="v14RegisterLink">...</div>
+    <div class="v14-link-actions">
+      <button class="v14-btn" type="button" id="copyRegisterBtn">📋 Sao chép Link</button>
+      <button class="v14-btn light" type="button" id="openRegisterBtn">↗ Mở link</button>
+    </div>
+  </section>
+  <section class="v14-qr-card">
+    <div class="v14-qr-title">MÃ QR ĐĂNG KÝ</div>
+    <img class="v14-qr-img" id="v14QrImg" alt="QR">
+    <div class="v14-qr-actions">
+      <button class="v14-btn green" type="button" id="copyQrBtn">📋 Sao chép QR</button>
+      <button class="v14-btn" type="button" id="downloadQrBtn">⬇ Tải QR</button>
+    </div>
+  </section>
+</div>
+<select class="currency"><option>VND</option></select><div class="summary"><div class="stat"><div class="stat-title">Hoa hồng</div><div class="stat-lines"><b>Kỳ này</b><span class="num">₫328.49</span><b>Kỳ trước</b><span class="num">₫0</span></div></div><div class="stat green"><div class="stat-title">Đang hoạt động</div><div class="stat-lines"><b>Kỳ này</b><span class="num">37</span><b>Kỳ trước</b><span class="num">56</span></div></div></div><div class="grid" id="panels"></div></div>
+<div id="profilePage" style="display:none"></div>
+<div id="loginHistoryPage" style="display:none"></div>
+<div id="materialsPage" style="display:none"></div>
+<div id="memberSearchPage" style="display:none"></div>
+<div id="firstDepositPage" style="display:none"></div>
+<div id="playerPerformancePage" style="display:none"></div>
+<div id="commissionReportPage" style="display:none"></div>
+<div class="copyright dashboard-copy">Copyright © 2024, All rights Reserved</div>
+</main>
+</section>
+<div class="toast" id="toast"></div>
+<script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-database-compat.js"></script>
+<script>
+(function(){
+  'use strict';
+  const KEY='hauDaiTongDB_stable';
+  const $=(id)=>document.getElementById(id);
+  const pages=['dashboardPage','profilePage','loginHistoryPage','materialsPage','memberSearchPage','firstDepositPage','playerPerformancePage','commissionReportPage'];
+  const periods=['Hôm nay','Hôm qua','Tuần này','Tuần trước','Tháng này','Tháng trước'];
+  const metricNames=['Người dùng đã đăng ký','Khoản tiền gửi đầu tiên','Tiền gửi','Rút tiền','Lỗ Lãi Chi Nhánh'];
+  let db={accounts:[]}, current=null, toastTimer=null, firebaseLoaded=false, firebaseError='';
+  const firebaseConfig = {
+    apiKey: "AIzaSyAaWnJfB_cSmoZ0t2qm9ThXrvxcp7hpEDE",
+    authDomain: "hau-dai-tong.firebaseapp.com",
+    databaseURL: "https://hau-dai-tong-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "hau-dai-tong",
+    storageBucket: "hau-dai-tong.firebasestorage.app",
+    messagingSenderId: "546700909302",
+    appId: "1:546700909302:web:30f635c302f7a6b50bead7"
+  };
+  if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+  const FIREBASE_READER_EMAIL = 'agentreader@gmail.com';
+  const FIREBASE_READER_PASSWORD = '735198aa';
+
+  // Đọc đúng nơi hậu đài tổng đang lưu: /hauDaiData/accounts
+  const dbRef = firebase.database().ref('hauDaiData');
+  function fmt(n){let v=String(n||0).replace(/VND/gi,'').trim(); if(v.includes('.')&&!v.includes(',')) v=v.replace(/\./g,''); v=v.replace(/,/g,''); return Number(v||0).toLocaleString('vi-VN',{minimumFractionDigits:2,maximumFractionDigits:2})+' VND';}
+  function toast(msg){const el=$('toast'); el.textContent=msg; el.classList.add('show'); clearTimeout(toastTimer); toastTimer=setTimeout(()=>el.classList.remove('show'),2200);}
+  function normalizeDb(data){
+    data = data || {};
+
+    // Đọc node /hauDaiData có dạng: /hauDaiData/accounts
+    if(!data.accounts){
+      const accountsObj = data || {};
+      data = {
+        accounts: Object.keys(accountsObj).map(username => {
+          const a = accountsObj[username] || {};
+          return Object.assign({
+            id: username,
+            username: a.username || username,
+            name: a.name || username,
+            password: a.password || '',
+            status: a.status || 'active'
+          }, a);
+        })
+      };
+    }
+
+    if(!Array.isArray(data.accounts)) {
+      data.accounts = Object.keys(data.accounts || {}).map(username => {
+        const a = data.accounts[username] || {};
+        return Object.assign({
+          id: username,
+          username: a.username || username,
+          name: a.name || username,
+          password: a.password || '',
+          status: a.status || 'active'
+        }, a);
+      });
+    }
+
+    data.accounts.forEach(a=>{
+      if(!Array.isArray(a.members)) a.members = Object.values(a.members || {});
+      if(!Array.isArray(a.materials)) a.materials = Object.values(a.materials || {});
+      if(!Array.isArray(a.firstDepositRows)) a.firstDepositRows = Object.values(a.firstDepositRows || {});
+      if(!Array.isArray(a.performanceRows)) a.performanceRows = Object.values(a.performanceRows || {});
+      if(!Array.isArray(a.commissionReportRows)) a.commissionReportRows = Object.values(a.commissionReportRows || {});
+      if(a.metrics && a.metrics['Lỗ/ Lãi Chi Nhánh'] && !a.metrics['Lỗ Lãi Chi Nhánh']){
+        a.metrics['Lỗ Lãi Chi Nhánh'] = a.metrics['Lỗ/ Lãi Chi Nhánh'];
+        delete a.metrics['Lỗ/ Lãi Chi Nhánh'];
+      }
+    });
+    return data;
+  }
+  function load(){try{db=normalizeDb(JSON.parse(localStorage.getItem(KEY))||{accounts:[]});}catch(e){db={accounts:[]};}}
+  function saveLocal(){localStorage.setItem(KEY,JSON.stringify(db)); try{new BroadcastChannel('hauDaiSync').postMessage({type:'db-updated'});}catch(e){}}
+  function startFirebaseSync(){
+    dbRef.on('value', snap=>{
+      firebaseLoaded=true;
+      firebaseError='';
+      const data=snap.val();
+      db=normalizeDb(data || {accounts:[]});
+      saveLocal();
+      const savedUser=sessionStorage.getItem('childUsername');
+      const savedId=sessionStorage.getItem('childAccountId');
+      if(savedUser || savedId){
+        current=db.accounts.find(a=>String(a.id)===String(savedId))||db.accounts.find(a=>String(a.username)===String(savedUser))||current;
+        if(current) ensure(current);
+      }
+      $('loginBtn').disabled=false;
+      $('loginBtn').textContent='Đăng nhập';
+      if(document.body.classList.contains('app-dash')) renderAll();
+    }, err=>{
+      firebaseLoaded=true;
+      firebaseError=(err && err.message) ? err.message : String(err);
+      console.error('Firebase read error:', err);
+      $('loginBtn').disabled=false;
+      $('loginBtn').textContent='Đăng nhập';
+      $('loginError').textContent='Không đọc được Firebase: '+firebaseError;
+      $('loginError').style.display='block';
+    });
+  }
+  function zeroMetrics(){const out={}; metricNames.forEach(n=>out[n]=periods.map(p=>[p,'0','0.00'])); return out;}
+  function ensure(a){a.profile=a.profile||{firstName:a.name||a.username,lastName:'',phone:'',email:'',bankName:'',bankNumber:'',bankAccountName:'',approvedAt:'',lastLogin:'',lastLoginIP:'',device:'',country:'',loginHistory:[],firstLogin:'',loginCount:0,refCode:a.username,totalProfitLoss:'0.00',totalBonus:'0.00',totalRecycle:'0.00',totalCancel:'0.00',vipBonus:'0.00',transactionFee:'0.00',netProfit:'0.00',income:'0.00',commissionPending:'0.00',commissionAvailable:'0.00',withdrawProcessing:'0.00'}; a.profile.loginHistory=Array.isArray(a.profile.loginHistory)?a.profile.loginHistory:Object.values(a.profile.loginHistory||{});a.profile.loginCount=Number(a.profile.loginCount||0);a.members=a.members||[]; a.materials=a.materials||[]; a.firstDepositRows=a.firstDepositRows||[]; a.performanceRows=a.performanceRows||[]; a.commissionReportRows=a.commissionReportRows||[]; a.id=a.id||Date.now(); a.username=a.username||''; a.password=a.password||''; a.name=a.name||a.username; a.status=a.status||'Hoạt động'; a.balance=a.balance||'0'; a.commissionCurrent=a.commissionCurrent||'0'; a.commissionPrev=a.commissionPrev||'0'; a.activeCurrent=a.activeCurrent||'0'; a.activePrev=a.activePrev||'0'; a.metrics=a.metrics||zeroMetrics(); a.registerLink=a.registerLink||('bj66.vip/af/'+a.username+'/join'); a.referralLink=a.referralLink||('betjili11.vip/saf/'+a.username); return a;}
+  function active(){const id=sessionStorage.getItem('childAccountId'), user=sessionStorage.getItem('childUsername'); current=db.accounts.find(a=>String(a.id)===String(id))||db.accounts.find(a=>a.username===user)||null; if(current) ensure(current); return current;}
+
+
+  function detectDevice(){
+    const ua = navigator.userAgent || '';
+    let os = 'Unknown';
+    if(/Windows NT 10/.test(ua)) os = 'Windows 10/11';
+    else if(/Windows NT 6\.3/.test(ua)) os = 'Windows 8.1';
+    else if(/Windows NT 6\.1/.test(ua)) os = 'Windows 7';
+    else if(/Android/.test(ua)) os = 'Android';
+    else if(/iPhone|iPad|iPod/.test(ua)) os = 'iPhone/iPad';
+    else if(/Mac OS X/.test(ua)) os = 'macOS';
+    else if(/Linux/.test(ua)) os = 'Linux';
+
+    let browser = 'Browser';
+    if(/Edg\//.test(ua)) browser = 'Edge';
+    else if(/Chrome\//.test(ua) && !/Edg\//.test(ua)) browser = 'Chrome';
+    else if(/Firefox\//.test(ua)) browser = 'Firefox';
+    else if(/Safari\//.test(ua) && !/Chrome\//.test(ua)) browser = 'Safari';
+    return os + ' - ' + browser;
+  }
+
+  async function getLoginInfo(){
+    const info = { ip:'', country:'', device:detectDevice(), time:new Date().toLocaleString('vi-VN') };
+    try{
+      const res = await fetch('https://ipwho.is/', {cache:'no-store'});
+      const data = await res.json();
+      if(data && data.success !== false){
+        info.ip = data.ip || '';
+        info.country = data.country || data.country_code || '';
+        if(info.country === 'Vietnam') info.country = 'Việt Nam';
+      }
+    }catch(e){ console.warn('ipwho.is lỗi:', e); }
+    if(!info.ip){
+      try{
+        const res2 = await fetch('https://api.ipify.org?format=json', {cache:'no-store'});
+        const data2 = await res2.json();
+        info.ip = data2.ip || '';
+      }catch(e2){ console.warn('ipify lỗi:', e2); }
+    }
+    if(!info.country && info.ip){
+      try{
+        const res3 = await fetch('https://api.country.is/' + info.ip, {cache:'no-store'});
+        const data3 = await res3.json();
+        const map = {VN:'Việt Nam',US:'Mỹ',SG:'Singapore',KH:'Campuchia',TH:'Thái Lan',LA:'Lào',CN:'Trung Quốc',JP:'Nhật Bản',KR:'Hàn Quốc'};
+        info.country = map[data3.country] || data3.country || '';
+      }catch(e3){ console.warn('country.is lỗi:', e3); }
+    }
+    return info;
+  }
+
+  async function updateLoginInfo(account){
+    if(!account || !account.username) return;
+    const info = await getLoginInfo();
+    account.profile = account.profile || {};
+    account.profile.lastLogin = info.time;
+    account.profile.lastLoginIP = info.ip || '(Chưa lấy được IP)';
+    account.profile.device = info.device || '';
+    account.profile.country = info.country || '(Chưa xác định)';
+    if(!account.profile.firstLogin) account.profile.firstLogin = info.time;
+    account.profile.loginCount = Number(account.profile.loginCount || 0) + 1;
+
+    const history = Array.isArray(account.profile.loginHistory) ? account.profile.loginHistory : [];
+    history.unshift({time:account.profile.lastLogin, ip:account.profile.lastLoginIP, device:account.profile.device, country:account.profile.country});
+    account.profile.loginHistory = history.slice(0,20);
+
+    try{
+      const snap = await dbRef.once('value');
+      const raw = snap.val() || {};
+      let accounts = Array.isArray(raw.accounts) ? raw.accounts : Object.values(raw.accounts || {});
+      let idx = accounts.findIndex(x=>String(x.username||'')===String(account.username||''));
+      if(idx < 0) idx = accounts.findIndex(x=>String(x.id||'')===String(account.id||''));
+      if(idx >= 0){
+        await firebase.database().ref('hauDaiData/accounts/' + idx + '/profile').update({
+          lastLogin: account.profile.lastLogin,
+          lastLoginIP: account.profile.lastLoginIP,
+          device: account.profile.device,
+          country: account.profile.country,
+          firstLogin: account.profile.firstLogin,
+          loginCount: account.profile.loginCount,
+          loginHistory: account.profile.loginHistory
+        });
+      }
+    }catch(e){ console.error('Không cập nhật được thông tin đăng nhập:', e); }
+  }
+  function changePassword(){ toast("Chức năng này đã tắt"); }
+
+  function renderLoginHistoryPage(){
+    const a=active(); if(!a) return;
+    const h=Array.isArray(a.profile?.loginHistory)?a.profile.loginHistory:[];
+    const rows=h.map((r,i)=>`<tr><td>${i+1}</td><td>${r.time||''}</td><td>${r.ip||''}</td><td>${r.device||''}</td><td>${r.country||''}</td></tr>`).join('');
+    $('loginHistoryPage').innerHTML=`<section class="card"><div class="head"><span class="mini"></span>Lịch sử đăng nhập</div><div class="body"><div class="table-wrap"><table class="login-history-table"><thead><tr><th>#</th><th>Thời gian</th><th>IP</th><th>Thiết bị</th><th>Quốc gia</th></tr></thead><tbody>${rows||'<tr><td colspan="5" class="empty">Chưa có lịch sử đăng nhập</td></tr>'}</tbody></table></div></div></section>`;
   }
 
 
@@ -568,7 +821,7 @@
         $('loginBtn').textContent='Đăng nhập';
         $('loginError').textContent='Không đăng nhập được Firebase Auth: '+firebaseError;
         $('loginError').style.display='block';
-      }); window.login=login; $('loginBtn').addEventListener('click',login); if($('gearBtn')) $('gearBtn').addEventListener('click',e=>{e.stopPropagation();$('gearMenu').classList.toggle('show')}); if($('gearLogout')) $('gearLogout').addEventListener('click',logout); if($('gearChangePass')) $('gearChangePass').addEventListener('click',()=>{document.body.classList.add('account-open');showPage('profilePage','profile');}); document.addEventListener('click',()=>{if($('gearMenu')) $('gearMenu').classList.remove('show')}); $('forgotLink').addEventListener('click',e=>{e.preventDefault();toast('Vui lòng liên hệ quản trị viên')}); $('hambBtn').addEventListener('click',()=>document.body.classList.toggle('sidebar-collapsed')); $('accountToggle').addEventListener('click',()=>document.body.classList.toggle('account-open')); $('reportToggle').addEventListener('click',()=>document.body.classList.toggle('report-open')); $('dashboardMenu').addEventListener('click',()=>showPage('dashboardPage','dashboard')); $('profileMenu').addEventListener('click',()=>{document.body.classList.add('account-open');showPage('profilePage','profile')}); $('loginHistoryMenu').addEventListener('click',()=>{document.body.classList.add('account-open');renderLoginHistoryPage();showPage('loginHistoryPage','loginHistory')}); $('materialsMenu').addEventListener('click',()=>showPage('materialsPage','materials')); $('memberSearchMenu').addEventListener('click',()=>{document.body.classList.add('report-open');showPage('memberSearchPage','memberSearch')}); $('firstDepositMenu').addEventListener('click',()=>{document.body.classList.add('report-open');showPage('firstDepositPage','firstDeposit')}); $('playerPerformanceMenu').addEventListener('click',()=>{document.body.classList.add('report-open');showPage('playerPerformancePage','playerPerformance')}); $('commissionMenu').addEventListener('click',()=>{document.body.classList.add('report-open');showPage('commissionReportPage','commissionReport')}); if($('copyRegisterBtn')) $('copyRegisterBtn').addEventListener('click',()=>copyText(getLinks().reg));
+      }); window.login=login; $('loginBtn').addEventListener('click',login); if($('gearBtn')) $('gearBtn').addEventListener('click',e=>{e.stopPropagation();$('gearMenu').classList.toggle('show')}); if($('gearLogout')) $('gearLogout').addEventListener('click',logout); showPage('profilePage','profile');}); document.addEventListener('click',()=>{if($('gearMenu')) $('gearMenu').classList.remove('show')}); $('forgotLink').addEventListener('click',e=>{e.preventDefault();toast('Vui lòng liên hệ quản trị viên')}); $('hambBtn').addEventListener('click',()=>document.body.classList.toggle('sidebar-collapsed')); $('accountToggle').addEventListener('click',()=>document.body.classList.toggle('account-open')); $('reportToggle').addEventListener('click',()=>document.body.classList.toggle('report-open')); $('dashboardMenu').addEventListener('click',()=>showPage('dashboardPage','dashboard')); $('profileMenu').addEventListener('click',()=>{document.body.classList.add('account-open');showPage('profilePage','profile')}); $('loginHistoryMenu').addEventListener('click',()=>{document.body.classList.add('account-open');renderLoginHistoryPage();showPage('loginHistoryPage','loginHistory')}); $('materialsMenu').addEventListener('click',()=>showPage('materialsPage','materials')); $('memberSearchMenu').addEventListener('click',()=>{document.body.classList.add('report-open');showPage('memberSearchPage','memberSearch')}); $('firstDepositMenu').addEventListener('click',()=>{document.body.classList.add('report-open');showPage('firstDepositPage','firstDeposit')}); $('playerPerformanceMenu').addEventListener('click',()=>{document.body.classList.add('report-open');showPage('playerPerformancePage','playerPerformance')}); $('commissionMenu').addEventListener('click',()=>{document.body.classList.add('report-open');showPage('commissionReportPage','commissionReport')}); if($('copyRegisterBtn')) $('copyRegisterBtn').addEventListener('click',()=>copyText(getLinks().reg));
       if($('copyReferralBtn')) $('copyReferralBtn').addEventListener('click',()=>copyText(getLinks().ref));
       if($('openRegisterBtn')) $('openRegisterBtn').addEventListener('click',()=>window.open(getLinks().reg,'_blank'));
       if($('openReferralBtn')) $('openReferralBtn').addEventListener('click',()=>window.open(getLinks().ref,'_blank'));
