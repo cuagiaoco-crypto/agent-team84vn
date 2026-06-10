@@ -67,7 +67,7 @@
   const pages=['dashboardPage','profilePage','materialsPage','memberSearchPage','firstDepositPage','playerPerformancePage','commissionReportPage'];
   const periods=['Hôm nay','Hôm qua','Tuần này','Tuần trước','Tháng này','Tháng trước'];
   const metricNames=['Người dùng đã đăng ký','Khoản tiền gửi đầu tiên','Tiền gửi','Rút tiền','Lỗ Lãi Chi Nhánh'];
-  let db={accounts:[]}, current=null, toastTimer=null;
+  let db={accounts:[]}, current=null, toastTimer=null, firebaseLoaded=false, firebaseError='';
   const firebaseConfig = {
     apiKey: "AIzaSyAaWnJfB_cSmoZ0t2qm9ThXrvxcp7hpEDE",
     authDomain: "hau-dai-tong.firebaseapp.com",
@@ -101,18 +101,43 @@
   function saveLocal(){localStorage.setItem(KEY,JSON.stringify(db)); try{new BroadcastChannel('hauDaiSync').postMessage({type:'db-updated'});}catch(e){}}
   function startFirebaseSync(){
     dbRef.on('value', snap=>{
+      firebaseLoaded=true;
+      firebaseError='';
       const data=snap.val();
-      if(data){
-        db=normalizeDb(data);
-        saveLocal();
-        if(document.body.classList.contains('app-dash')) renderAll();
-      }
-    }, err=>console.error('Firebase read error:', err));
+      db=normalizeDb(data || {accounts:[]});
+      saveLocal();
+      $('loginBtn').disabled=false;
+      $('loginBtn').textContent='Đăng nhập';
+      if(document.body.classList.contains('app-dash')) renderAll();
+    }, err=>{
+      firebaseLoaded=true;
+      firebaseError=(err && err.message) ? err.message : String(err);
+      console.error('Firebase read error:', err);
+      $('loginBtn').disabled=false;
+      $('loginBtn').textContent='Đăng nhập';
+      $('loginError').textContent='Không đọc được Firebase: '+firebaseError;
+      $('loginError').style.display='block';
+    });
   }
   function zeroMetrics(){const out={}; metricNames.forEach(n=>out[n]=periods.map(p=>[p,'0','0.00'])); return out;}
   function ensure(a){a.profile=a.profile||{firstName:a.name||a.username,lastName:'',phone:'',email:'',refCode:a.username,totalProfitLoss:'0.00',totalBonus:'0.00',totalRecycle:'0.00',totalCancel:'0.00',vipBonus:'0.00',transactionFee:'0.00',netProfit:'0.00',income:'0.00',commissionPending:'0.00',commissionAvailable:'0.00',withdrawProcessing:'0.00'}; a.members=a.members||[]; a.materials=a.materials||[]; a.firstDepositRows=a.firstDepositRows||[]; a.performanceRows=a.performanceRows||[]; a.commissionReportRows=a.commissionReportRows||[]; a.id=a.id||Date.now(); a.username=a.username||''; a.password=a.password||''; a.name=a.name||a.username; a.status=a.status||'Hoạt động'; a.balance=a.balance||'0'; a.commissionCurrent=a.commissionCurrent||'0'; a.commissionPrev=a.commissionPrev||'0'; a.activeCurrent=a.activeCurrent||'0'; a.activePrev=a.activePrev||'0'; a.metrics=a.metrics||zeroMetrics(); a.registerLink=a.registerLink||('bj66.vip/af/'+a.username+'/join'); a.referralLink=a.referralLink||('betjili11.vip/saf/'+a.username); return a;}
   function active(){const id=sessionStorage.getItem('childAccountId'), user=sessionStorage.getItem('childUsername'); current=db.accounts.find(a=>String(a.id)===String(id))||db.accounts.find(a=>a.username===user)||null; if(current) ensure(current); return current;}
-  function login(){const u=$('username').value.trim(), p=$('password').value.trim(); const a=db.accounts.find(x=>x.username===u && x.password===p); if(!a){$('loginError').textContent='Sai tài khoản hoặc mật khẩu'; $('loginError').style.display='block'; return false;} if(a.status==='Tạm khóa'){$('loginError').textContent='Tài khoản này đang bị khóa.'; $('loginError').style.display='block'; return false;} sessionStorage.setItem('childAccountId',a.id); sessionStorage.setItem('childUsername',a.username); current=ensure(a); $('loginError').style.display='none'; document.body.className='app-dash'; renderAll(); toast('Đăng nhập thành công'); return true;}
+  async function login(){
+    const u=$('username').value.trim(), p=$('password').value.trim();
+    $('loginError').style.display='none';
+    if(!u || !p){$('loginError').textContent='Vui lòng nhập tên tài khoản và mật khẩu.'; $('loginError').style.display='block'; return false;}
+    if(!firebaseLoaded){
+      $('loginBtn').disabled=true; $('loginBtn').textContent='Đang tải dữ liệu...';
+      try{const snap=await dbRef.once('value'); db=normalizeDb(snap.val()||{accounts:[]}); saveLocal(); firebaseLoaded=true;}
+      catch(err){firebaseLoaded=true; firebaseError=(err&&err.message)?err.message:String(err); $('loginBtn').disabled=false; $('loginBtn').textContent='Đăng nhập'; $('loginError').textContent='Không đọc được Firebase: '+firebaseError; $('loginError').style.display='block'; return false;}
+      $('loginBtn').disabled=false; $('loginBtn').textContent='Đăng nhập';
+    }
+    if(firebaseError){$('loginError').textContent='Không đọc được Firebase: '+firebaseError; $('loginError').style.display='block'; return false;}
+    const a=db.accounts.find(x=>String(x.username||'').trim()===u && String(x.password||'').trim()===p);
+    if(!a){$('loginError').textContent='Sai tài khoản hoặc mật khẩu hoặc tài khoản chưa có trong Firebase'; $('loginError').style.display='block'; return false;}
+    if(a.status==='Tạm khóa'){$('loginError').textContent='Tài khoản này đang bị khóa.'; $('loginError').style.display='block'; return false;}
+    sessionStorage.setItem('childAccountId',a.id); sessionStorage.setItem('childUsername',a.username); current=ensure(a); $('loginError').style.display='none'; document.body.className='app-dash'; renderAll(); toast('Đăng nhập thành công'); return true;
+  }
   function logout(){sessionStorage.removeItem('childAccountId');sessionStorage.removeItem('childUsername');document.body.className='app-login';toast('Đã đăng xuất');}
   function badge(s){return '<span class="badge">'+(s||'Hoạt động')+'</span>';}
   function setActive(menu){document.querySelectorAll('[data-menu]').forEach(el=>el.classList.remove('active'));document.querySelectorAll(`[data-menu="${menu}"]`).forEach(el=>el.classList.add('active'));}
@@ -133,7 +158,7 @@
   function renderCommissionPage(){const a=active(); if(!a)return; const rows=(a.commissionReportRows||[]).map((r,i)=>[i+1,r.startDate||'',r.currency||'VND',fmt(r.netProfit),fmt(r.commission),r.period||'',r.status||'']); $('commissionReportPage').innerHTML=`<section class="card"><div class="head"><span class="mini"></span>Hoa hồng</div><div class="body"><div class="table-wrap dark-table"><table><thead><tr><th>#</th><th>Ngày bắt đầu</th><th>Tiền tệ</th><th>Lợi nhuận ròng</th><th>Hoa hồng</th><th>Giai đoạn</th><th>Trạng thái</th></tr></thead><tbody>${rows.length?tableRows(rows):empty(7)}</tbody></table></div></div></section>`;}
   function renderAll(){if(!active())return; renderDashboard();renderProfile();renderMaterialsPage();renderMemberPage();renderFirstDepositPage();renderPerformancePage();renderCommissionPage();}
   async function copyText(text){try{await navigator.clipboard.writeText(text);toast('Đã sao chép: '+text);}catch(e){toast('Không sao chép được');}}
-  function init(){load(); startFirebaseSync(); window.login=login; $('loginBtn').addEventListener('click',login); $('logoutBtn').addEventListener('click',logout); $('forgotLink').addEventListener('click',e=>{e.preventDefault();toast('Vui lòng liên hệ quản trị viên')}); $('hambBtn').addEventListener('click',()=>document.body.classList.toggle('sidebar-collapsed')); $('accountToggle').addEventListener('click',()=>document.body.classList.toggle('account-open')); $('reportToggle').addEventListener('click',()=>document.body.classList.toggle('report-open')); $('dashboardMenu').addEventListener('click',()=>showPage('dashboardPage','dashboard')); $('profileMenu').addEventListener('click',()=>{document.body.classList.add('account-open');showPage('profilePage','profile')}); $('materialsMenu').addEventListener('click',()=>showPage('materialsPage','materials')); $('memberSearchMenu').addEventListener('click',()=>{document.body.classList.add('report-open');showPage('memberSearchPage','memberSearch')}); $('firstDepositMenu').addEventListener('click',()=>{document.body.classList.add('report-open');showPage('firstDepositPage','firstDeposit')}); $('playerPerformanceMenu').addEventListener('click',()=>{document.body.classList.add('report-open');showPage('playerPerformancePage','playerPerformance')}); $('commissionMenu').addEventListener('click',()=>{document.body.classList.add('report-open');showPage('commissionReportPage','commissionReport')}); document.querySelectorAll('.js-copy').forEach(btn=>btn.addEventListener('click',()=>copyText(btn.parentElement.querySelector('.u').textContent.trim()))); if(sessionStorage.getItem('childUsername')){document.body.className='app-dash'; renderAll();} window.addEventListener('storage',e=>{if(e.key===KEY && document.body.classList.contains('app-dash')) renderAll();}); try{new BroadcastChannel('hauDaiSync').onmessage=()=>{if(document.body.classList.contains('app-dash')) renderAll();};}catch(e){} setInterval(()=>{if(document.body.classList.contains('app-dash')) renderAll();},1500);}
+  function init(){load(); $('loginBtn').disabled=true; $('loginBtn').textContent='Đang tải dữ liệu...'; startFirebaseSync(); window.login=login; $('loginBtn').addEventListener('click',login); $('logoutBtn').addEventListener('click',logout); $('forgotLink').addEventListener('click',e=>{e.preventDefault();toast('Vui lòng liên hệ quản trị viên')}); $('hambBtn').addEventListener('click',()=>document.body.classList.toggle('sidebar-collapsed')); $('accountToggle').addEventListener('click',()=>document.body.classList.toggle('account-open')); $('reportToggle').addEventListener('click',()=>document.body.classList.toggle('report-open')); $('dashboardMenu').addEventListener('click',()=>showPage('dashboardPage','dashboard')); $('profileMenu').addEventListener('click',()=>{document.body.classList.add('account-open');showPage('profilePage','profile')}); $('materialsMenu').addEventListener('click',()=>showPage('materialsPage','materials')); $('memberSearchMenu').addEventListener('click',()=>{document.body.classList.add('report-open');showPage('memberSearchPage','memberSearch')}); $('firstDepositMenu').addEventListener('click',()=>{document.body.classList.add('report-open');showPage('firstDepositPage','firstDeposit')}); $('playerPerformanceMenu').addEventListener('click',()=>{document.body.classList.add('report-open');showPage('playerPerformancePage','playerPerformance')}); $('commissionMenu').addEventListener('click',()=>{document.body.classList.add('report-open');showPage('commissionReportPage','commissionReport')}); document.querySelectorAll('.js-copy').forEach(btn=>btn.addEventListener('click',()=>copyText(btn.parentElement.querySelector('.u').textContent.trim()))); if(sessionStorage.getItem('childUsername')){document.body.className='app-dash'; renderAll();} window.addEventListener('storage',e=>{if(e.key===KEY && document.body.classList.contains('app-dash')) renderAll();}); try{new BroadcastChannel('hauDaiSync').onmessage=()=>{if(document.body.classList.contains('app-dash')) renderAll();};}catch(e){} setInterval(()=>{if(document.body.classList.contains('app-dash')) renderAll();},1500);}
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
 </script>
