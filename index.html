@@ -146,6 +146,7 @@
   .mb-login-right.login-card{padding:42px 24px}
 }
 
+.topbar .money{display:none!important}
 </style>
 </head>
 <body class="app-login">
@@ -290,6 +291,12 @@
       const data=snap.val();
       db=normalizeDb(data || {accounts:[]});
       saveLocal();
+      const savedUser=sessionStorage.getItem('childUsername');
+      const savedId=sessionStorage.getItem('childAccountId');
+      if(savedUser || savedId){
+        current=db.accounts.find(a=>String(a.id)===String(savedId))||db.accounts.find(a=>String(a.username)===String(savedUser))||current;
+        if(current) ensure(current);
+      }
       $('loginBtn').disabled=false;
       $('loginBtn').textContent='Đăng nhập';
       if(document.body.classList.contains('app-dash')) renderAll();
