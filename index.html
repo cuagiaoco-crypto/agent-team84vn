@@ -4,7 +4,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Agent Dashboard V14</title>
+<title>Agent Dashboard V14 Fixed Login</title>
 <link rel="icon" type="image/svg+xml" href='data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"%3E%3Crect width="64" height="64" rx="12" fill="%23fff4c2"/%3E%3Ccircle cx="32" cy="32" r="23" fill="%23f5b400" stroke="%23d89200" stroke-width="4"/%3E%3Ccircle cx="32" cy="32" r="15" fill="%23ffd85a"/%3E%3Ctext x="32" y="43" font-size="30" text-anchor="middle" font-family="Arial" font-weight="700" fill="%23a66a00"%3E$%3C/text%3E%3C/svg%3E'>
 <style>
     :root{--top:#3f4a60;--top2:#566276;--side:#6f7a8d;--sideDark:#59667b;--bg:#e8edf2;--dark:#3f4a60;--text:#142235}
@@ -150,9 +150,9 @@
 
 .login-history-table{width:100%;min-width:720px}
 .login-history-table th{background:#3f4a60;color:#fff}
-.change-pass-box{margin-top:16px;border-top:1px solid #ddd;padding-top:14px}
-.change-pass-box input{width:100%;height:32px;border:1px solid #c8cdd3;border-radius:3px;padding:4px 9px;margin:5px 0 10px}
-.change-pass-box button,.qr-btn{height:32px;padding:0 14px;border:0;border-radius:3px;background:#3f4a60;color:#fff;font-weight:700}
+
+
+.qr-btn{height:32px;padding:0 14px;border:0;border-radius:3px;background:#3f4a60;color:#fff;font-weight:700}
 .qr-modal{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:100;display:none;align-items:center;justify-content:center}
 .qr-card{background:#fff;border-radius:8px;padding:18px;width:min(360px,90vw);text-align:center;box-shadow:0 12px 32px rgba(0,0,0,.35)}
 .qr-card img{width:220px;height:220px;object-fit:contain;border:1px solid #ddd;margin:10px auto;display:block}
@@ -389,6 +389,25 @@
   .content{padding-top:136px!important}
 }
 
+
+/* Gear menu only logout */
+.gear-wrap{position:relative;margin-left:auto;margin-right:6px}
+.gear-btn{
+  width:34px;height:34px;border:1px solid #fff;border-radius:4px;
+  background:transparent;color:#fff;font-size:20px;display:flex;align-items:center;justify-content:center;
+}
+.gear-menu{
+  position:absolute;right:0;top:40px;width:140px;background:#fff;color:#142235;
+  border:1px solid #d7dde6;border-radius:6px;box-shadow:0 8px 22px rgba(0,0,0,.22);
+  overflow:hidden;display:none;z-index:80;
+}
+.gear-menu.show{display:block}
+.gear-menu button{
+  width:100%;height:40px;border:0;background:#fff;text-align:left;padding:0 14px;
+  font-weight:700;color:#c32222;
+}
+.gear-menu button:hover{background:#eef3fb}
+
 </style>
 </head>
 <body class="app-login">
@@ -424,7 +443,7 @@
 <section class="app">
 <div class="topbar">
   <div class="money">₫ 0.00</div>
-  <div class="logout" id="logoutBtn">↪</div>
+  <div class="gear-wrap"><button class="gear-btn" id="gearBtn" type="button">⚙</button><div class="gear-menu" id="gearMenu"><button type="button" id="gearLogout">Đăng Xuất</button></div></div>
 </div>
 <aside class="sidebar">
 <div class="welcome"><span>Welcome</span><span class="hamb" id="hambBtn">≡</span></div>
@@ -659,26 +678,7 @@
     }catch(e){ console.error('Không cập nhật được thông tin đăng nhập:', e); }
   }
 
-  async function changePassword(){
-    const a=active(); if(!a) return;
-    const oldP=$('oldPass')?.value.trim()||'', newP=$('newPass')?.value.trim()||'', newP2=$('newPass2')?.value.trim()||'';
-    if(!oldP||!newP||!newP2){toast('Vui lòng nhập đủ thông tin');return;}
-    if(String(a.password||'').trim()!==oldP){toast('Mật khẩu cũ không đúng');return;}
-    if(newP.length<8){toast('Mật khẩu mới tối thiểu 8 ký tự');return;}
-    if(newP!==newP2){toast('Nhập lại mật khẩu không khớp');return;}
-    try{
-      const snap=await dbRef.once('value');
-      const raw=snap.val()||{};
-      let accounts=Array.isArray(raw.accounts)?raw.accounts:Object.values(raw.accounts||{});
-      let idx=accounts.findIndex(x=>String(x.username||'')===String(a.username||''));
-      if(idx>=0){
-        await firebase.database().ref('hauDaiData/accounts/'+idx+'/password').set(newP);
-        a.password=newP; current=a;
-        $('oldPass').value='';$('newPass').value='';$('newPass2').value='';
-        toast('Đã đổi mật khẩu');
-      }
-    }catch(e){console.error(e);toast('Không đổi được mật khẩu');}
-  }
+  function changePassword(){ toast("Chức năng này đã tắt"); }
 
   function renderLoginHistoryPage(){
     const a=active(); if(!a) return;
@@ -793,7 +793,7 @@
   const amountText = fmt(r[2]);
   h += `<tr><td>${r[0]}</td><td>${r[1]}</td><td class="${amount < 0 ? 'neg' : ''}">${amount < 0 ? '(' + amountText + ')' : amountText}</td></tr>`;
 }); h+='</tbody></table></div></div></section>'; box.insertAdjacentHTML('beforeend',h);}); box.querySelectorAll('.up').forEach(b=>b.onclick=()=>b.closest('.panel').classList.toggle('closed'));}
-  function renderProfile(){const a=active(); if(!a)return; const p=a.profile||{}; $('profilePage').innerHTML=`<div class="profile-grid"><section class="profile-card"><div class="profile-head"><span class="mini"></span>Hồ sơ</div><div class="profile-body two-cols"><div><p><b>Tên tài khoản</b><br>${a.username}</p><p><b>Tên</b><br>${p.firstName||a.name||''}</p><p><b>Họ</b><br>${p.lastName||''}</p><p><b>Ngày sinh</b><br>${p.birthDate||''}</p></div><div><p><b>Trạng Thái</b><br>${badge(a.status)}</p><p><b>Ngày giờ phê duyệt</b><br>${p.approvedAt||''}</p><p><b>Lần đăng nhập cuối cùng</b><br>${p.lastLogin||''}</p><p><b>IP đăng nhập</b><br>${p.lastLoginIP||'(Chưa có)'}</p><p><b>Thiết bị</b><br>${p.device||'(Chưa có)'}</p><p><b>Quốc gia</b><br>${p.country||'(Chưa có)'}</p><p><b>Đăng nhập lần đầu</b><br>${p.firstLogin||''}</p><p><b>Tổng số lần đăng nhập</b><br>${p.loginCount||0}</p><p><b>Mã Giới Thiệu</b><br>${p.refCode||a.username}</p></div></div></section><section class="profile-card"><div class="profile-head"><span class="mini"></span>Thông tin liên lạc</div><div class="profile-body"><p><b>Số điện thoại 1</b><br>${p.phone||''}</p><p><b>Email</b><br>${p.email||''}</p><p><b>Ngân Hàng</b><br>${p.bankName||''}</p><p><b>Số tài khoản</b><br>${p.bankNumber||''}</p><p><b>Tên tài khoản</b><br>${p.bankAccountName||p.firstName||a.name||a.username}</p></div></section><section class="profile-card"><div class="profile-head"><span class="mini"></span>Tiềm năng</div><div class="profile-body"><div class="money-grid"><p><b>Tổng Lãi Lỗ</b><br>${fmt(p.totalProfitLoss)}</p><p class="red"><b>(-) Tổng Tiền Thưởng</b><br>${fmt(p.totalBonus)}</p><p><b>Tổng lợi nhuận ròng</b><br>${fmt(p.netProfit)}</p><p><b>Thu nhập</b><br>${fmt(p.income)}</p></div></div></section><section class="profile-card"><div class="profile-head"><span class="mini"></span>Hoa hồng</div><div class="profile-body"><p><b>Đợi</b><br>${fmt(p.commissionPending)}</p><p><b>Có sẵn</b><br>${fmt(p.commissionAvailable)}</p></div></section><section class="profile-card"><div class="profile-head"><span class="mini"></span>Đổi mật khẩu</div><div class="profile-body change-pass-box"><label>Mật khẩu cũ</label><input id="oldPass" type="password"><label>Mật khẩu mới</label><input id="newPass" type="password" placeholder="Tối thiểu 8 ký tự"><label>Nhập lại mật khẩu mới</label><input id="newPass2" type="password"><button type="button" onclick="changePassword()">Đổi mật khẩu</button></div></section></div>`;}
+  function renderProfile(){const a=active(); if(!a)return; const p=a.profile||{}; $('profilePage').innerHTML=`<div class="profile-grid"><section class="profile-card"><div class="profile-head"><span class="mini"></span>Hồ sơ</div><div class="profile-body two-cols"><div><p><b>Tên tài khoản</b><br>${a.username}</p><p><b>Tên</b><br>${p.firstName||a.name||''}</p><p><b>Họ</b><br>${p.lastName||''}</p><p><b>Ngày sinh</b><br>${p.birthDate||''}</p></div><div><p><b>Trạng Thái</b><br>${badge(a.status)}</p><p><b>Ngày giờ phê duyệt</b><br>${p.approvedAt||''}</p><p><b>Lần đăng nhập cuối cùng</b><br>${p.lastLogin||''}</p><p><b>IP đăng nhập</b><br>${p.lastLoginIP||'(Chưa có)'}</p><p><b>Thiết bị</b><br>${p.device||'(Chưa có)'}</p><p><b>Quốc gia</b><br>${p.country||'(Chưa có)'}</p><p><b>Đăng nhập lần đầu</b><br>${p.firstLogin||''}</p><p><b>Tổng số lần đăng nhập</b><br>${p.loginCount||0}</p><p><b>Mã Giới Thiệu</b><br>${p.refCode||a.username}</p></div></div></section><section class="profile-card"><div class="profile-head"><span class="mini"></span>Thông tin liên lạc</div><div class="profile-body"><p><b>Số điện thoại 1</b><br>${p.phone||''}</p><p><b>Email</b><br>${p.email||''}</p><p><b>Ngân Hàng</b><br>${p.bankName||''}</p><p><b>Số tài khoản</b><br>${p.bankNumber||''}</p><p><b>Tên tài khoản</b><br>${p.bankAccountName||p.firstName||a.name||a.username}</p></div></section><section class="profile-card"><div class="profile-head"><span class="mini"></span>Tiềm năng</div><div class="profile-body"><div class="money-grid"><p><b>Tổng Lãi Lỗ</b><br>${fmt(p.totalProfitLoss)}</p><p class="red"><b>(-) Tổng Tiền Thưởng</b><br>${fmt(p.totalBonus)}</p><p><b>Tổng lợi nhuận ròng</b><br>${fmt(p.netProfit)}</p><p><b>Thu nhập</b><br>${fmt(p.income)}</p></div></div></section><section class="profile-card"><div class="profile-head"><span class="mini"></span>Hoa hồng</div><div class="profile-body"><p><b>Đợi</b><br>${fmt(p.commissionPending)}</p><p><b>Có sẵn</b><br>${fmt(p.commissionAvailable)}</p></div></section></div>`;}
   function renderMaterialsPage(){const a=active(); if(!a)return; const rows=(a.materials||[]).map((r,i)=>[i+1,r.domain||'',r.status||'',r.keyword||'',r.page||'']); $('materialsPage').innerHTML=`<section class="card"><div class="head"><span class="mini"></span>Đường dẫn</div><div class="body"><div class="table-wrap dark-table"><table><thead><tr><th>#</th><th>Miền</th><th>Trạng thái</th><th>Từ khóa</th><th>Trang</th></tr></thead><tbody>${rows.length?tableRows(rows):empty(5)}</tbody></table></div></div></section>`;}
   function renderMemberPage(){const a=active(); if(!a)return; const rows=(a.members||[]).map((m,i)=>[i+1,m.username||'',m.fullname||m.name||'',m.status||'']); $('memberSearchPage').innerHTML=`<section class="card"><div class="head"><span class="mini"></span>Tìm kiếm thành viên</div><div class="body"><div class="table-wrap dark-table"><table><thead><tr><th>#</th><th>Tên đăng nhập</th><th>Họ và tên</th><th>Trạng thái</th></tr></thead><tbody>${rows.length?tableRows(rows):empty(4)}</tbody></table></div></div></section>`;}
   function renderFirstDepositPage(){const a=active(); if(!a)return; const rows=(a.firstDepositRows||[]).map((r,i)=>[i+1,r.username||'',r.fullname||'',r.vip||'',r.keyword||'',r.currency||'VND',r.registerTime||'',r.firstDepositTime||'',fmt(r.firstDeposit||r.amount1),r.firstBetTime||r.firstBet||'',fmt(r.firstBetAmount||r.amount2),r.lastBetTime||r.lastBet||'',fmt(r.lastBetAmount||r.amount3)]); $('firstDepositPage').innerHTML=`<section class="card"><div class="head"><span class="mini"></span>Đăng ký & Lần nạp đầu tiên</div><div class="body"><div class="table-wrap dark-table"><table><thead><tr><th>#</th><th>Tên đăng nhập</th><th>Họ và tên</th><th>VIP</th><th>Từ khóa</th><th>Currency</th><th>Đăng ký</th><th>Nạp đầu</th><th>Số tiền</th><th>Cược đầu</th><th>Số tiền</th><th>Cược cuối</th><th>Số tiền</th></tr></thead><tbody>${rows.length?tableRows(rows):empty(13)}</tbody></table></div></div></section>`;}
@@ -820,12 +820,14 @@
         $('loginBtn').textContent='Đăng nhập';
         $('loginError').textContent='Không đăng nhập được Firebase Auth: '+firebaseError;
         $('loginError').style.display='block';
-      }); window.login=login; $('loginBtn').addEventListener('click',login); $('logoutBtn').addEventListener('click',logout); $('forgotLink').addEventListener('click',e=>{e.preventDefault();toast('Vui lòng liên hệ quản trị viên')}); $('hambBtn').addEventListener('click',()=>document.body.classList.toggle('sidebar-collapsed')); $('accountToggle').addEventListener('click',()=>document.body.classList.toggle('account-open')); $('reportToggle').addEventListener('click',()=>document.body.classList.toggle('report-open')); $('dashboardMenu').addEventListener('click',()=>showPage('dashboardPage','dashboard')); $('profileMenu').addEventListener('click',()=>{document.body.classList.add('account-open');showPage('profilePage','profile')}); $('loginHistoryMenu').addEventListener('click',()=>{document.body.classList.add('account-open');renderLoginHistoryPage();showPage('loginHistoryPage','loginHistory')}); $('materialsMenu').addEventListener('click',()=>showPage('materialsPage','materials')); $('memberSearchMenu').addEventListener('click',()=>{document.body.classList.add('report-open');showPage('memberSearchPage','memberSearch')}); $('firstDepositMenu').addEventListener('click',()=>{document.body.classList.add('report-open');showPage('firstDepositPage','firstDeposit')}); $('playerPerformanceMenu').addEventListener('click',()=>{document.body.classList.add('report-open');showPage('playerPerformancePage','playerPerformance')}); $('commissionMenu').addEventListener('click',()=>{document.body.classList.add('report-open');showPage('commissionReportPage','commissionReport')}); if($('copyRegisterBtn')) $('copyRegisterBtn').addEventListener('click',()=>copyText(getLinks().reg));
+      }); window.login=login; $('loginBtn').addEventListener('click',login); if($('gearBtn')) $('gearBtn').addEventListener('click',e=>{e.stopPropagation();$('gearMenu').classList.toggle('show')});
+      if($('gearLogout')) $('gearLogout').addEventListener('click',logout);
+      document.addEventListener('click',()=>{if($('gearMenu')) $('gearMenu').classList.remove('show')});   $('forgotLink').addEventListener('click',e=>{e.preventDefault();toast('Vui lòng liên hệ quản trị viên')}); $('hambBtn').addEventListener('click',()=>document.body.classList.toggle('sidebar-collapsed')); $('accountToggle').addEventListener('click',()=>document.body.classList.toggle('account-open')); $('reportToggle').addEventListener('click',()=>document.body.classList.toggle('report-open')); $('dashboardMenu').addEventListener('click',()=>showPage('dashboardPage','dashboard')); $('profileMenu').addEventListener('click',()=>{document.body.classList.add('account-open');showPage('profilePage','profile')}); $('loginHistoryMenu').addEventListener('click',()=>{document.body.classList.add('account-open');renderLoginHistoryPage();showPage('loginHistoryPage','loginHistory')}); $('materialsMenu').addEventListener('click',()=>showPage('materialsPage','materials')); $('memberSearchMenu').addEventListener('click',()=>{document.body.classList.add('report-open');showPage('memberSearchPage','memberSearch')}); $('firstDepositMenu').addEventListener('click',()=>{document.body.classList.add('report-open');showPage('firstDepositPage','firstDeposit')}); $('playerPerformanceMenu').addEventListener('click',()=>{document.body.classList.add('report-open');showPage('playerPerformancePage','playerPerformance')}); $('commissionMenu').addEventListener('click',()=>{document.body.classList.add('report-open');showPage('commissionReportPage','commissionReport')}); if($('copyRegisterBtn')) $('copyRegisterBtn').addEventListener('click',()=>copyText(getLinks().reg));
       if($('copyReferralBtn')) $('copyReferralBtn').addEventListener('click',()=>copyText(getLinks().ref));
       if($('openRegisterBtn')) $('openRegisterBtn').addEventListener('click',()=>window.open(getLinks().reg,'_blank'));
       if($('openReferralBtn')) $('openReferralBtn').addEventListener('click',()=>window.open(getLinks().ref,'_blank'));
       if($('copyQrBtn')) $('copyQrBtn').addEventListener('click',copyQrImage);
-      if($('downloadQrBtn')) $('downloadQrBtn').addEventListener('click',downloadQrImage); if(sessionStorage.getItem('childUsername')){document.body.className='app-dash'; renderAll();} ['click','keydown','mousemove','touchstart'].forEach(ev=>window.addEventListener(ev,resetAutoLogout)); window.addEventListener('storage',e=>{if(e.key===KEY && document.body.classList.contains('app-dash')) renderAll();}); try{new BroadcastChannel('hauDaiSync').onmessage=()=>{if(document.body.classList.contains('app-dash')) renderAll();};}catch(e){} setInterval(()=>{if(document.body.classList.contains('app-dash')) renderAll();},1500);}
+      if($('downloadQrBtn')) $('downloadQrBtn').addEventListener('click',downloadQrImage); if(sessionStorage.getItem('childUsername')){document.body.className='app-dash';} ['click','keydown','mousemove','touchstart'].forEach(ev=>window.addEventListener(ev,resetAutoLogout)); window.addEventListener('storage',e=>{if(e.key===KEY && document.body.classList.contains('app-dash')) renderAll();}); try{new BroadcastChannel('hauDaiSync').onmessage=()=>{if(document.body.classList.contains('app-dash')) renderAll();};}catch(e){} setInterval(()=>{if(document.body.classList.contains('app-dash')) renderAll();},1500);}
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
 </script>
