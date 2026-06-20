@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Đăng ký tài khoản</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,Helvetica,sans-serif;min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#5d5af7,#b35cf5);color:#142235}
+.card{width:min(430px,92vw);background:#fff;border-radius:12px;box-shadow:0 20px 45px rgba(0,0,0,.25);overflow:hidden}
+.head{padding:28px 26px;background:linear-gradient(135deg,#665cff,#ec5aa5);color:#fff}
+.head h1{margin:0 0 8px;font-size:30px}.head p{margin:0;font-size:15px}
+.body{padding:24px 26px}
+label{display:block;font-weight:700;margin:14px 0 7px}
+input{width:100%;height:44px;border:1px solid #cfd7e3;border-radius:6px;padding:0 12px;font-size:15px}
+button{width:100%;height:46px;margin-top:18px;border:0;border-radius:6px;background:#175bd6;color:#fff;font-weight:800;font-size:16px;cursor:pointer}
+.note{font-size:13px;color:#596579;line-height:1.5;margin-top:14px}
+.err{display:none;color:#d7222d;font-weight:700;margin-top:12px;text-align:center}
+.ok{display:none;color:#159447;font-weight:700;margin-top:12px;text-align:center}
+.agent{font-weight:800}
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="head">
+    <h1>MB66</h1>
+    <p>Đăng ký qua mã giới thiệu: <span class="agent" id="agentText"></span></p>
+  </div>
+  <div class="body">
+    <label>Tên tài khoản khách muốn đăng ký</label>
+    <input id="customerUsername" placeholder="Ví dụ: khach123" autocomplete="username">
+    <label>Họ và tên / ghi chú</label>
+    <input id="customerName" placeholder="Không bắt buộc">
+    <button id="submitBtn">Lưu và tiếp tục đăng ký</button>
+    <div class="err" id="err"></div>
+    <div class="ok" id="ok"></div>
+    <div class="note">Sau khi bấm tiếp tục, hệ thống sẽ lưu tên tài khoản vào hậu đài rồi chuyển sang trang đăng ký chính.</div>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-database-compat.js"></script>
+<script>
+const firebaseConfig={apiKey:"AIzaSyAaWnJfB_cSmoZ0t2qm9ThXrvxcp7hpEDE",authDomain:"hau-dai-tong.firebaseapp.com",databaseURL:"https://hau-dai-tong-default-rtdb.asia-southeast1.firebasedatabase.app",projectId:"hau-dai-tong",storageBucket:"hau-dai-tong.firebasestorage.app",messagingSenderId:"546700909302",appId:"1:546700909302:web:30f635c302f7a6b50bead7"};
+if(!firebase.apps.length)firebase.initializeApp(firebaseConfig);
+const FIREBASE_READER_EMAIL="agentreader@gmail.com";
+const FIREBASE_READER_PASSWORD="735198aa";
+
+const params=new URLSearchParams(location.search);
+const agent=(params.get("agent")||params.get("a")||"").trim();
+const target=params.get("target")||"https://mb668.city/?f=9180745";
+document.getElementById("agentText").textContent=agent||"Không có";
+
+function showErr(m){document.getElementById("err").textContent=m;document.getElementById("err").style.display="block";document.getElementById("ok").style.display="none"}
+function showOk(m){document.getElementById("ok").textContent=m;document.getElementById("ok").style.display="block";document.getElementById("err").style.display="none"}
+function cleanKey(s){return String(s||"").trim().replace(/[.#$\[\]\/]/g,"_")}
+
+async function saveCustomer(){
+  const username=document.getElementById("customerUsername").value.trim();
+  const fullname=document.getElementById("customerName").value.trim();
+
+  if(!agent){showErr("Link thiếu mã nhân viên.");return}
+  if(!username){showErr("Vui lòng nhập tên tài khoản khách.");return}
+
+  const btn=document.getElementById("submitBtn");
+  btn.disabled=true;
+  btn.textContent="Đang lưu...";
+
+  try{
+    await firebase.auth().signInWithEmailAndPassword(FIREBASE_READER_EMAIL,FIREBASE_READER_PASSWORD);
+
+    const root=firebase.database().ref("hauDaiData/accounts");
+    const snap=await root.once("value");
+    const raw=snap.val()||{};
+    const accounts=Array.isArray(raw)?raw:Object.values(raw);
+    const idx=accounts.findIndex(a=>String(a.username||"").trim()===agent);
+
+    if(idx<0){
+      showErr("Không tìm thấy nhân viên: "+agent);
+      btn.disabled=false;
+      btn.textContent="Lưu và tiếp tục đăng ký";
+      return;
+    }
+
+    const memberKey=cleanKey(username)+"_"+Date.now();
+    await firebase.database().ref("hauDaiData/accounts/"+idx+"/members/"+memberKey).set({
+      username,
+      fullname:fullname||username,
+      status:"Chờ đăng ký",
+      agent,
+      registeredAt:new Date().toLocaleString("vi-VN"),
+      source:"register_page"
+    });
+
+    showOk("Đã lưu vào hậu đài. Đang chuyển...");
+    setTimeout(()=>{location.href=target},900);
+  }catch(e){
+    console.error(e);
+    showErr("Không lưu được Firebase: "+(e.message||e));
+    btn.disabled=false;
+    btn.textContent="Lưu và tiếp tục đăng ký";
+  }
+}
+
+document.getElementById("submitBtn").addEventListener("click",saveCustomer);
+document.getElementById("customerUsername").addEventListener("keydown",e=>{if(e.key==="Enter")saveCustomer()});
+</script>
+</body>
+</html>
