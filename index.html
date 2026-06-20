@@ -721,15 +721,11 @@
   function tableRows(rows){return rows.map(r=>'<tr>'+r.map(v=>'<td>'+v+'</td>').join('')+'</tr>').join('');}
   function empty(cols){return `<tr><td colspan="${cols}" class="empty">No data available in table</td></tr>`;}
 
-  function makeMiddleRegisterLink(a){
-    const real = a.registerLink || 'https://mb668.city/?f=9180745';
-    return 'register.html?agent=' + encodeURIComponent(a.username || '') + '&target=' + encodeURIComponent(real);
-  }
   function getLinks(){
     const a=active();
     if(!a) return {reg:'', ref:''};
     return {
-      reg: makeMiddleRegisterLink(a),
+      reg: a.registerLink || ('bj66.vip/af/'+a.username+'/join'),
       ref: a.referralLink || ('betjili11.vip/saf/'+a.username)
     };
   }
